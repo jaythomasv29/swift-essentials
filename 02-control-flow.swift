@@ -17,7 +17,6 @@
 // → The challenge has NO answer provided — figure it out
 // ============================================================
  
- 
 import Foundation
  
  
@@ -443,7 +442,7 @@ case let waitTimeMinutes where waitTimeMinutes < 15:
     print("Short wait — would you like a seat at the bar?")
 case let waitTimeMinutes where waitTimeMinutes < 30:
     print("Moderate wait — we'll text you when ready")
-case let waitTimeMinutes where waitTimeMinutes > 30:
+case let waitTimeMinutes where waitTimeMinutes >= 30:
     print("Long wait (\(waitTimeMinutes) mins) — complimentary appetizer offered")    
 default:
     break
@@ -533,11 +532,11 @@ default:
 let guestAge = 17
 switch guestAge {
 
-case (0..<13): 
+case 0..<13: 
     print("Kids menu available")
-case (13...17):
+case 13...17:
     print("Teens - no alcohol permitted")
-case (18...20):
+case 18...20:
     print("Young adult - ID required for alcohol")
 default:
     print("Full menu available")
@@ -792,12 +791,13 @@ func isValidBusinessHour(visitHour: Int) -> Bool { (11...22).contains(visitHour)
 
 
 func checkStatus(name: String, partySize: Int, visitHour: Int, visitDay: String, hasReservation: Bool, prefersSpicy: Bool) {
-    print("\(isValidBusinessHour(visitHour: visitHour) ? "You can visit Thai Kitchen, we are currently open!" : "We are currently closed")") 
-    print("Thai Kitchen is open until 10PM")
+    
     // guard to check against valid visit time
     guard isValidBusinessHour(visitHour: visitHour) else {
+        print("We are currently closed - We open at 11am")
         return
     }
+    print("Thai Kitchen is open until 10PM")
 
     // guard against Monday closure
     guard visitDay != "Monday" else {
@@ -842,11 +842,11 @@ func checkStatus(name: String, partySize: Int, visitHour: Int, visitDay: String,
     }
 
     // check reservation status
-    if(partySize >= 7 && !hasReservation) {
+    if partySize >= 7 && !hasReservation {
         print("Warning: large party without reservation — wait time may exceed 45 mins")
-    } else if (partySize >= 7 && hasReservation) {
-        print("Confirmed: reservation on file for \(customerName)")
-    } else if (partySize < 7 && hasReservation) {
+    } else if partySize >= 7 && hasReservation {
+        print("Confirmed: reservation on file for \(name)")
+    } else if partySize < 7 && hasReservation {
         print("Reservation confirmed — no wait expected")
     } else {
         print("Walk-in welcome — tables available")
@@ -854,7 +854,7 @@ func checkStatus(name: String, partySize: Int, visitHour: Int, visitDay: String,
     // spice recommendation
     print("\(prefersSpicy ? "Recommendation: try the Thai hot Pad See Ew" : "Recommendation: Pad Thai mild is our most popular dish")")
 
-    print("See you soon, \(customerName)! — Thai Kitchen")
+    print("See you soon, \(name)! — Thai Kitchen")
 }
 
 // ── HINTS ────────────────────────────────────────────────────
