@@ -86,7 +86,22 @@ if tableIsClean && serverIsAvailable {
 //   Last order:  9:30 PM               (21 in 24hr — simplify to hour)
 //
 // Use this starting data:
-var hour = 16        // try changing this to test different scenarios
+
+// 1. Print "Thai Kitchen is open" or "Thai Kitchen is closed"
+//    based on whether hour falls in 11...22
+//
+// 2. Inside the "open" block, add a nested if:
+//    if it's happy hour (15 to 18), print "Happy hour is active — 20% off drinks"
+//
+// 3. Add another condition: if hour is 21 or later AND the restaurant is open,
+//    print "Last orders — kitchen closes soon"
+//
+// 4. Add a final condition: if isHoliday is true,
+//    print "Holiday hours may vary — please call ahead"
+//    (this should print regardless of whether they're open or closed)
+ 
+// YOUR CODE BELOW:
+ var hour = 16        // try changing this to test different scenarios
 var isHoliday = false
 let businessHours = 11...22
 
@@ -104,22 +119,6 @@ if businessHours.contains(hour) {
 if isHoliday {
     print("Holiday hours may vary — please call ahead")
 }
-
-// 1. Print "Thai Kitchen is open" or "Thai Kitchen is closed"
-//    based on whether hour falls in 11...22
-//
-// 2. Inside the "open" block, add a nested if:
-//    if it's happy hour (15 to 18), print "Happy hour is active — 20% off drinks"
-//
-// 3. Add another condition: if hour is 21 or later AND the restaurant is open,
-//    print "Last orders — kitchen closes soon"
-//
-// 4. Add a final condition: if isHoliday is true,
-//    print "Holiday hours may vary — please call ahead"
-//    (this should print regardless of whether they're open or closed)
- 
-// YOUR CODE BELOW:
- 
  
  
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -190,6 +189,16 @@ let vipGuest = false
 //    based on whether temperature (from examples above) is above 18
  
 // YOUR CODE BELOW:
+// 1
+print("\(tablesFull == totalTables ? "Full house tonight " : "Tables available")")
+// 2
+let suggestedTip = isLunchTime ? 0.15 : 0.18
+print("Suggested Tip: \(suggestedTip)")
+// 3
+let guestGreeting = vipGuest ? "Welcome back - your usual table is ready" : "Welcome to Thai Kitchen"
+print("Guest Greeting: \(guestGreeting)")
+// 4
+print("\(temperature > 18 ? "Patio: open" : "Patio: closed")")
  
  
  
@@ -261,6 +270,8 @@ default:
 //    "delivered"  → "Enjoy your meal!"
 //    "cancelled"  → "Order cancelled — we're sorry to hear that"
 //    default      → "Unknown status"
+
+
 //
 // 2. Create a var called 'spiceLevel' set to 3
 //    Write a switch that prints:
@@ -271,6 +282,8 @@ default:
 //    5 → "Thai hot — chef's warning applies"
 //    default → "Invalid spice level — choose 1 to 5"
 //
+
+
 // 3. Create a var called 'dayOfWeek2' set to "Saturday"
 //    Write a switch where:
 //    Monday + Tuesday   → "Slow days — staff training may occur"
@@ -278,10 +291,57 @@ default:
 //    Friday + Saturday  → "Busy — expect wait times"
 //    Sunday             → "Brunch service — different menu"
 //    default            → "Invalid day"
- 
+
 // YOUR CODE BELOW:
+ // 1
+let orderStatus = "preparing"  // this status should be var because it changes, for now I'll default for let
+
+switch orderStatus {
+    case "placed": 
+        print("Order received - we'll start soon")
+    case "preparing":
+        print("Chef is working on your order")
+    case "ready":
+        print("Your order is ready - server on the way")
+    case "delivered":
+        print("Enjoy your meal!")
+    case "cancelled":
+        print("order cancelled - we're sorry to hear that")
+    default:
+        print("Unknown status")
+} 
  
- 
+// 2
+let spiceLevel = 3
+switch spiceLevel {
+case 1:  
+    print("Mild")
+case 2:  
+    print("Medium")
+case 3:  
+    print("Spicy")
+case 4:  
+    print("Very spicy")
+case 5:  
+    print("Thai hot — chef's warning applies")
+default:
+    print("Invalid spice level - choose 1 to 5")
+}
+
+// 3
+let dayOfWeek2 = "Saturday"
+switch dayOfWeek2 {
+    case "Monday", "Tuesday":
+        print("Slow days - staff training may occur")
+    case "Wednesday", "Thursday":
+        print("Mid-week - regular service")
+    case "Friday", "Saturday":
+        print("Busy - expect wait times")
+    case "Sunday":
+        print("Brunch service - different menu")
+    default:
+        print("Invalid day")
+}
  
  
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -346,6 +406,7 @@ default:
 //    Over $150    → "Premium bill — manager thank you card + dessert"
 //    Use value binding to include the amount in the print message
 //
+
 // 2. Create a var 'waitTimeMinutes' set to 25
 //    Write a switch with where clauses:
 //    0 mins           → "Your table is ready now"
@@ -354,8 +415,40 @@ default:
 //    Over 30 mins     → "Long wait (\(waitTimeMinutes) mins) — complimentary appetizer offered"
  
 // YOUR CODE BELOW:
- 
- 
+
+
+// 1
+let billAmount = 145
+
+switch billAmount {
+case let billAmount where billAmount < 30:
+    print("Small bill \(billAmount)- standard service")    
+case let billAmount where billAmount < 75:
+    print("Medium bill \(billAmount)- thank you for dining with us")    
+case let billAmount where billAmount < 150:
+    print("Large bill \(billAmount)- complimentary dessert offered")
+case let billAmount where billAmount >= 150:
+    print("Premium bill \(billAmount)- manager thank you card + dessert")
+default:
+    break
+
+}
+
+// 2
+let waitTimeMinutes = 25
+switch waitTimeMinutes {
+case let waitTimeMinutes where waitTimeMinutes == 0:
+    print("Your table is ready now")    
+case let waitTimeMinutes where waitTimeMinutes < 15:
+    print("Short wait — would you like a seat at the bar?")
+case let waitTimeMinutes where waitTimeMinutes < 30:
+    print("Moderate wait — we'll text you when ready")
+case let waitTimeMinutes where waitTimeMinutes > 30:
+    print("Long wait (\(waitTimeMinutes) mins) — complimentary appetizer offered")    
+default:
+    break
+
+}
  
  
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -420,6 +513,7 @@ default:
 //    18 to 20      → "Young adult — ID required for alcohol"
 //    21 and above  → "Full menu available"
 //
+
 // 2. Create these two vars:
 //    var currentHour2 = 19
 //    var isRaining = true
@@ -433,10 +527,39 @@ default:
 //
 //    Define dinner hours as 17...22
 //    Define lunch hours as 11..<17
- 
+
 // YOUR CODE BELOW:
- 
- 
+ // 1
+let guestAge = 17
+switch guestAge {
+
+case (0..<13): 
+    print("Kids menu available")
+case (13...17):
+    print("Teens - no alcohol permitted")
+case (18...20):
+    print("Young adult - ID required for alcohol")
+default:
+    print("Full menu available")
+}
+
+// 2 
+var currentHour2 = 13
+var isRaining = false
+
+switch (currentHour2, isRaining) {
+    case (17...22, true):
+        print("Cozy night in - patio closed, indoor dining available")
+    case (17...22, false):
+        print("Beautiful evening - patio seating available")
+    case (11..<17, true):
+        print("Rainy lunch - soup specials today")
+    case (11..<17, false):
+        print("Great lunch weather - outdoor seating open")
+    default:
+        print("Outside service hours")
+
+}
  
  
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -522,6 +645,7 @@ func processOrderWithoutGuard(itemName: String, quantity: Int, price: Double) {
 //    - name: String
 //    - partySize: Int
 //    - hour: Int
+
 //
 //    Add guard statements that check:
 //    → name must not be empty — print "Reservation requires a name"
@@ -539,7 +663,33 @@ func processOrderWithoutGuard(itemName: String, quantity: Int, price: Double) {
  
 // YOUR CODE BELOW:
  
- 
+ //wow first time creating a function, didn't learn about it specifically yet, but I think its best to learn it by actually doing it and jumping in
+func makeReservation(name: String, partySize: Int, hour: Int) {
+    let acceptedPartySize = 1...20 // this has to be saved as a variable? I cannot do 1...20.contains(partySize)?
+    let businessHours = 11...22
+    
+
+    guard !name.isEmpty else {
+        print("Reservation requires a name")
+        return
+    }
+
+    guard acceptedPartySize.contains(partySize) else {
+        print("Party size must be 1 to 20")
+        return
+    }
+
+    guard (businessHours.contains(hour)) else {
+        print("We are not open at that hour")
+        return
+    }
+    print("Reservation confirmed for \(name) - party size of \(partySize) at \(hour):00")
+}
+
+   makeReservation(name: "James", partySize: 4, hour: 19)   // should confirm
+   makeReservation(name: "", partySize: 4, hour: 19)         // should fail: name
+   makeReservation(name: "James", partySize: 25, hour: 19)  // should fail: party size
+   makeReservation(name: "James", partySize: 4, hour: 23)   // should fail: hour
  
  
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -589,6 +739,7 @@ func processOrderWithoutGuard(itemName: String, quantity: Int, price: Double) {
 //    Friday–Saturday  → "Weekend visit — expect a lively atmosphere"
 //    Sunday           → "Sunday visit — brunch menu available until 3 PM"
 //    default          → "Invalid day"
+
 //
 // 3. HAPPY HOUR CHECK
 //    Happy hour: 3 PM to 6 PM (15 to 18)
@@ -630,6 +781,82 @@ func processOrderWithoutGuard(itemName: String, quantity: Int, price: Double) {
 // → All output must use string interpolation
 // → No hardcoded names or values in the logic — use your variables
 //
+var visitHour    = 17      // 5:00 PM
+var visitDay     = "Friday"
+var partySize3    = 8
+var hasReservation = false
+var customerName = "Sarah"
+var prefersSpicy = true
+    // Open only between 11 AM to 10 PM
+func isValidBusinessHour(visitHour: Int) -> Bool { (11...22).contains(visitHour)}
+
+
+func checkStatus(name: String, partySize: Int, visitHour: Int, visitDay: String, hasReservation: Bool, prefersSpicy: Bool) {
+    print("\(isValidBusinessHour(visitHour: visitHour) ? "You can visit Thai Kitchen, we are currently open!" : "We are currently closed")") 
+    print("Thai Kitchen is open until 10PM")
+    // guard to check against valid visit time
+    guard isValidBusinessHour(visitHour: visitHour) else {
+        return
+    }
+
+    // guard against Monday closure
+    guard visitDay != "Monday" else {
+        print("Closed on Mondays - please visit another day")
+        return
+    } 
+
+    // guard against party size
+    guard partySize > 0 else {
+        print("Invalid party size")
+        return
+    }
+
+    // check rest of the days
+    switch visitDay.lowercased() {
+        case "tuesday", "wednesday", "thursday": 
+            print("Weekday visit — regular service")
+        case "friday", "saturday":
+            print("Weekend visit — expect a lively atmosphere")
+        case "sunday":
+            print("Sunday visit — brunch menu available until 3 PM")
+        default:
+            print("Invalid day")
+    }
+
+    // check if visiting during happy hour 3pm - 6pm (15-18)
+    print("\((15...18).contains(visitHour) ? "Happy hour active — 20% off drinks" : "Regular pricing")")
+
+    // party size assessment
+    switch partySize {
+        case 1...2:
+            print("Intimate dining — bar or small table available")
+        case 3...6:
+            print("Standard party — no reservation required")
+        case 7...12:
+            print("Large party — reservation strongly recommended")
+        case 13... :
+            print("Event size — please call ahead to arrange")
+        default:
+            print("Invalid party size")
+            return
+    }
+
+    // check reservation status
+    if(partySize >= 7 && !hasReservation) {
+        print("Warning: large party without reservation — wait time may exceed 45 mins")
+    } else if (partySize >= 7 && hasReservation) {
+        print("Confirmed: reservation on file for \(customerName)")
+    } else if (partySize < 7 && hasReservation) {
+        print("Reservation confirmed — no wait expected")
+    } else {
+        print("Walk-in welcome — tables available")
+    }
+    // spice recommendation
+    print("\(prefersSpicy ? "Recommendation: try the Thai hot Pad See Ew" : "Recommendation: Pad Thai mild is our most popular dish")")
+
+    print("See you soon, \(customerName)! — Thai Kitchen")
+}
+
 // ── HINTS ────────────────────────────────────────────────────
 // → Start by writing the function signature and the guard statements
 // → Then add each section one at a time — run after each addition
@@ -647,7 +874,8 @@ func processOrderWithoutGuard(itemName: String, quantity: Int, price: Double) {
 // See you soon, Sarah! — Thai Kitchen
 //
 // ── YOUR CODE BELOW ──────────────────────────────────────────
- 
+print("CHECK STATUS: ")
+ checkStatus(name: customerName, partySize: partySize3, visitHour: visitHour, visitDay: visitDay, hasReservation: hasReservation, prefersSpicy: prefersSpicy)
  
  
  
