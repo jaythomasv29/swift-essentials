@@ -115,7 +115,6 @@ for staff in staffNames {
 
 
 
-
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: prints 5 greetings
 // Exercise 2: prints 5 shift hours
@@ -221,7 +220,10 @@ for table in stride(from: 2, through: 20, by: 2) {
     print("Table \(table)")
 }
 
-
+for time in stride(from: 10, through: 1, by: -1) {
+    print("\(time) seconds to service...")
+    if time == 1 { print("Service begins!") } // this can be inside the loop to check, or simply just print after the loop ends outside
+    }
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: Table 1 through Table 12
@@ -401,7 +403,36 @@ print("Daily target \(totalSales >= dailyTarget ? "reached" : "not reached")")
 //    Then print: "Restaurant is full" or "No more full tables fit"
 
 // YOUR CODE BELOW:
+// 1
+var totalTables = 8
+while totalTables > 0 {
+    print("Cleaning table \(totalTables)...")
+    totalTables -= 1
+}
+print("All tables clean - ready to open")
 
+// 2
+var startingBalance: Double = 100
+let items = [12.50, 18.00, 8.50, 22.00, 15.00, 9.50, 25.00]
+var idx = 0
+
+while idx < items.count && startingBalance - items[idx] > 0 {
+    let price = items[idx]
+    startingBalance -= price
+    print("Purchased item for $\(price) - balance: $\(startingBalance)")
+    idx += 1
+}
+print("Gift card balance: $\(startingBalance)")
+
+// 3
+var capacity = 0
+let max = 30
+let peopleSeated = 4
+while capacity + peopleSeated <= max {
+    capacity += peopleSeated
+    print("Seated table of \(peopleSeated) — capacity: \(capacity)/\(max)")
+}
+capacity == max ? print("Restaurant is full") : print("No more full tables fit")
 
 
 
