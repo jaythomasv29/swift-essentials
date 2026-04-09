@@ -95,7 +95,7 @@ let hourlyRate = 18.50
 // YOUR CODE BELOW:
 
 for staff in staffNames {
-    print("Good morning, \(staff)")
+    print("Good morning, \(staff)!")
 }
 
 for shift in shiftHours {
@@ -487,7 +487,10 @@ repeat {
 //    - The block prints "Would you like to see the dessert menu?"
 //    - Set a var 'offersRemaining' to 0
 //    - The condition checks if offersRemaining > 0
-//    Confirm it prints exactly once even though offersRemaining is 0
+//    Confirm it prints exactly once even though offersRemaining is
+// 
+// wow reminds me of a do while in javascript that executes once at least
+
 //
 // 2. A kitchen prints a ticket for each order.
 //    Start with 'ticketCount' = 4
@@ -501,13 +504,22 @@ repeat {
 
 // YOUR CODE BELOW:
 
+var offersRemaining = 0
+repeat {
+    print("Would you like to see the dessert menu?")
+    offersRemaining -= 1
+} while offersRemaining > 0 // add this condition to check to print only once after decremented
 
-
+var ticketCount = 4
+repeat {
+    print("Printing ticket \(ticketCount)...")
+    ticketCount -= 1
+} while ticketCount > 0
+print("All tickets printed")
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: prints "Would you like to see the dessert menu?" once
 // Exercise 2: prints 4 tickets in descending order
-
 
 // ============================================================
 // TOPIC 6 — BREAK AND CONTINUE
@@ -577,11 +589,30 @@ let itemPrices = [14.99, 12.50, 8.00, 16.00, 7.00]
 //    For items $10 and over, print:
 //    "[item name] — $[price] — premium item"
 //    HINT: you'll need both index and price to get the item name
-
 // YOUR CODE BELOW:
-
-
-
+// 1
+for item in inventory {
+print("Checking: \(item)")
+    if item.lowercased() == "green curry" {
+        print("Green Curry is on the menu!")
+        break
+    }
+}
+// 2
+for item in inventory {
+    if outOfStock.contains(item) {
+        print("Skipping \(item) — out of stock")
+        continue
+    }
+    print("Available: \(item)")
+}
+// 3
+for (index, price) in itemPrices.enumerated() {
+    if price < 10 {
+        continue
+    }
+    print("\(inventory[index]) — $\(price) — premium item")
+}
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: checks Pad Thai, Tom Kha, Spring Rolls, finds Green Curry, stops
@@ -638,11 +669,13 @@ let tableOrders = [
 //    "3.  Green Curry             $16.00  (unavailable)"
 //    Items don't need to be perfectly aligned — just readable.
 //
+
 // 2. AVAILABLE ITEMS ONLY
 //    Use for-in with continue to print ONLY available items.
 //    Print a header: "── Tonight's available dishes ──"
 //    Then list only items where menuAvailable[index] is true.
 //
+
 // 3. PRICE RANGE SUMMARY
 //    Use a for-in loop to find:
 //    - The cheapest available item and its name
@@ -652,6 +685,7 @@ let tableOrders = [
 //    "Premium pick: Green Curry — $16.00"
 //    NOTE: check availability before comparing prices
 //
+
 // 4. TABLE ORDER SUMMARIES
 //    Use a for-in loop over tableOrders (with enumerated()).
 //    For each table, use an inner for-in loop over the item indices.
@@ -660,7 +694,8 @@ let tableOrders = [
 //    "  Pad Thai — $14.99"
 //    "  Green Curry — $16.00"
 //    "  Table total: $30.99"
-//
+//  
+
 // 5. RUNNING DAILY TOTAL
 //    Use a while loop to accumulate the daily total
 //    across all four tables.
@@ -668,6 +703,8 @@ let tableOrders = [
 //    after each table is added.
 //    Use += and String(format: "%.2f", total) for formatting.
 //
+
+
 // 6. MOST POPULAR ITEM
 //    Count how many times each item was ordered across all tables.
 //    Print the item that appears most frequently:
@@ -675,6 +712,8 @@ let tableOrders = [
 //    HINT: use a for-in loop inside a for-in loop
 //          a Dictionary [Int: Int] can track index → count
 //
+
+
 // ── RULES ────────────────────────────────────────────────────
 // → Use for-in with enumerated() for requirements 1, 2, 4
 // → Use for-in with continue for requirement 2
@@ -693,9 +732,79 @@ let tableOrders = [
 // → Requirement 6 is the hardest — attempt 1–5 first
 //
 // ── YOUR CODE BELOW ──────────────────────────────────────────
+// 1
+for (index, item) in menu.enumerated() {
+    print("\(index + 1).  \(item)         $\(String(format:"%.2f", menuPrices[index]))")
+}
 
+// 2
+print("── Tonight's available dishes ──")
+for (index, item) in menu.enumerated() {
+    if(!menuAvailable[index]) {
+        continue
+    }
+    print(item)
+}
 
+// 3
+var cheapestItemIdx = -1
+var mostExpensiveItemIdx = -1
+for index in 0..<menuPrices.count {
+    guard menuAvailable[index]  else {
+        continue
+    }
+    if cheapestItemIdx == -1 || menuPrices[index] < menuPrices[cheapestItemIdx] {
+        cheapestItemIdx = index
+    }
+    if mostExpensiveItemIdx == -1 || menuPrices[index] > menuPrices[mostExpensiveItemIdx] {
+        mostExpensiveItemIdx = index
+    }
+}
 
+print("Most affordable: \(menu[cheapestItemIdx]) — $\(String(format: "%.2f", menuPrices[cheapestItemIdx]))")
+print("Premium pick: \(menu[mostExpensiveItemIdx]) — $\(String(format: "%.2f", menuPrices[mostExpensiveItemIdx]))")
+
+// 4 & 5
+var dailyRevenue: Double = 0
+var tableIdx = 0
+
+while tableIdx < tableOrders.count {
+
+for (index, order) in tableOrders.enumerated() {
+    var tableTotal: Double = 0 // after every inside loop is completed the value is reset to 0
+    print("── Table \(index + 1) ──")
+    for itemIdx in order {
+        tableTotal += menuPrices[itemIdx]
+        print("     \(menu[itemIdx]) - $\(String(format: "%.2f", menuPrices[itemIdx]))")
+    }
+        print("     Table total: $\(String(format: "%.2f", tableTotal))")
+        dailyRevenue += tableTotal
+        print("     Daily revenue so far: $\(String(format: "%.2f", dailyRevenue))")
+        tableIdx += 1
+}
+    
+}
+
+// 6
+var orderCount: [String:Int] = [:]
+var mostOrderedItem = ""
+var itemFrequency = -1
+
+for order in tableOrders {
+    for itemIdx in order {
+        let menuItem = menu[itemIdx]
+        orderCount[menuItem, default: 0] += 1
+
+        
+    }
+}
+for (item, count) in orderCount {
+    if count > itemFrequency {
+        itemFrequency = count
+        mostOrderedItem = item
+    }
+}
+print("Most ordered tonight: \(mostOrderedItem) (ordered \(itemFrequency) times)")
 
 // ============================================================
 // END OF CHAPTER 3
