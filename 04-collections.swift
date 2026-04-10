@@ -781,6 +781,24 @@ let staffWorkedToday = ["James", "Maria", "Carlos", "Tom", "Nina"]
 //    ... and so on
 //    HINT: sort staffRoster.keys and look up role + wage for each
 //
+let sortedStaffRoster = staffRoster.keys.sorted().map{ "\($0) - \(staffRoles[$0] ?? " ") - $\(String(format: "%.2f", staffRoster[$0] ?? 0))/hr"}
+for staff in sortedStaffRoster {
+    print(staff)
+}
+func getTodayStaffDetails(_ name: String) -> (name: String, role: String, hours: Double, pay: Double) {
+    let role = staffRoles[name] ?? ""
+    let hours = staffShiftHours[name] ?? 0.0
+    let rate = staffRoster[name] ?? 0.0
+    let pay = hours * rate
+    return (name, role, hours, pay)
+}
+
+for staff in staffWorkedToday {
+    let (name, role, hours, pay) = getTodayStaffDetails(staff)
+    print("\(name) | \(role) | \(String(format: "%.2f", hours)) hrs | $\(String(format: "%.2f", pay))")
+}
+
+// print(getTodayStaffDetails(name: "James"))
 // 2. TODAY'S SHIFT SUMMARY
 //    For each staff member who worked today (staffWorkedToday),
 //    calculate their shift pay: wage × hours
