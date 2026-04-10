@@ -316,9 +316,11 @@ print(totalOnly)   // 101.4
 //    - hasDeposit: Bool = false
 //    Print each field using dot notation
 //
+print("----------BEGIN EXERCISES 3 BELOW----------")
+
 // 2. Decompose the tuple from exercise 1 into separate variables
 //    and print: "Reservation for James — party of 4 at 19:00"
-//
+
 // 3. Write a function called 'shiftSummary' that takes:
 //    - staffName: String
 //    - hoursWorked: Double
@@ -343,8 +345,27 @@ let menuStatus = [true, true, true, false, true]
 //    based on the available field
 
 // YOUR CODE BELOW:
+// 1
+let reservation = (name: "James", partySize: 4, hour: 19, hasDeposit: true)
+print("Reservation for \(reservation.name) - party of \(reservation.partySize) at \(reservation.hour):00")
+// 2
+let (name, partySize, hour, hasDeposit) = reservation
+print("Reservation for \(name) — party of \(partySize) at \(hour):00, party has \(hasDeposit ? "deposit" : "no deposit")")
+// 3
+func shiftSummary(staffName: String, hoursWorked: Double, hourlyRate: Double) -> (name: String, hours: Double, pay: Double) {
+    (staffName, hoursWorked, hoursWorked * hourlyRate)
+} 
+let maria = shiftSummary(staffName: "Maria", hoursWorked: 6.5, hourlyRate: 19.00)
+print("\(maria.name) worked \(maria.hours) hours - pay: $\(String(format: "%.2f", maria.pay))")
+// 4
+func menuItemInfo(index: Int) -> (name: String, price: Double, available: Bool) {
+    (menuNames[index], menuCosts[index], menuStatus[index])
+}
+let menuItem1 = menuItemInfo(index: 3)
 
-
+let menuItem2 = menuItemInfo(index: 0)
+print("\(menuItem1.name) - $\(String(format: "%.2f", menuItem1.price)) - \(menuItem1.available ? "available" : "unavailable")")
+print("\(menuItem2.name) - $\(String(format: "%.2f", menuItem2.price)) - \(menuItem2.available ? "available" : "unavailable")")
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -404,6 +425,7 @@ print(greetings)   // ["Good morning, James!", ...]
 let wages: [String: Double] = ["James": 22.50, "Maria": 19.00, "Carlos": 21.00]
 let raisedWages = wages.mapValues { $0 * 1.10 }   // 10% raise
 print(raisedWages)
+print("----------BEGIN EXERCISES 4 BELOW----------")
 
 // ── YOUR TURN ────────────────────────────────────────────────
 // Use this data:
@@ -430,16 +452,25 @@ let dishCalories = [650, 420, 580, 280, 120]
 //          use indices: dishNames.indices.map { i in ... }
 
 // YOUR CODE BELOW:
-
-
-
+let capitalizedNames = dishNames.map { name in name.capitalized }
+print(capitalizedNames)
+// 2
+let discountedDishPrices = dishPrices.map { String(format: "%.2f", $0 * 0.85) }
+print(discountedDishPrices)
+// 3
+let caloriedDishes = dishCalories.map { calories in "\(calories) kcal"}
+print(caloriedDishes)
+// 4
+let menuLineItem = dishNames.indices.map { idx in 
+    "\(capitalizedNames[idx]) - $\(String(format:"%.2f", dishPrices[idx]))"
+}
+print(menuLineItem)
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: ["Pad Thai", "Tom Kha Soup", "Green Curry", "Spring Rolls", "Thai Iced Tea"]
 // Exercise 2: ["$12.74", "$10.63", "$13.60", "$6.80", "$4.68"]
 // Exercise 3: ["650 kcal", "420 kcal", "580 kcal", "280 kcal", "120 kcal"]
 // Exercise 4: ["Pad Thai — $14.99", "Tom Kha Soup — $12.50", ...]
-
 
 // ============================================================
 // TOPIC 5 — FILTER
@@ -490,15 +521,13 @@ print(expensiveFormatted)   // ["$14.99", "$12.50", "$16.00", "$11.50"]
 
 // ── YOUR TURN ────────────────────────────────────────────────
 // Use this data:
-let allDishes = ["Pad Thai", "Tom Kha Soup", "Green Curry", "Spring Rolls",
-                 "Pad See Ew", "Tom Yum Soup", "Mango Sticky Rice", "Thai Iced Tea"]
+let allDishes = ["Pad Thai", "Tom Kha Soup", "Green Curry", "Spring Rolls", "Pad See Ew", "Tom Yum Soup", "Mango Sticky Rice", "Thai Iced Tea"]
 let allPricesFilter = [14.99, 12.50, 16.00, 8.00, 14.99, 11.50, 7.00, 5.50]
 let allAvailable = [true, true, false, true, true, false, true, true]
 let allCaloriesFilter = [650, 420, 580, 280, 600, 320, 350, 120]
 
 // 1. Filter allDishes to only dishes that start with "T"
 //    Print the result
-//
 // 2. Filter allPricesFilter to only prices between $10 and $15 (inclusive)
 //    Print the result
 //
@@ -519,9 +548,30 @@ let allCaloriesFilter = [650, 420, 580, 280, 600, 320, 350, 120]
 //    Print each one
 
 // YOUR CODE BELOW:
+// 1 
+let allDishesStartingWithT = allDishes.filter { $0.lowercased().hasPrefix("t") }
+print(allDishesStartingWithT)
+// 2
+let filteredPricesinRange10To15 = allPricesFilter.filter { $0 >= 10 && $0 <= 15 }
+print(filteredPricesinRange10To15)
+// 3
+let availableDishes = allDishes.indices
+    .filter { idx in allAvailable[idx] }
+    .map { allDishes[$0]}
+print(availableDishes)
+// 4
+let dishesUnder13 = allPricesFilter.indices
+    .filter { allPricesFilter[$0] < 13.00 }
+    .filter { allAvailable[$0]}
+    .map { "\(allDishes[$0]) - $\(String(format: "%.2f", allPricesFilter[$0]))" }
+print(dishesUnder13)
 
+// 5
+let lowCalorieDishes = allCaloriesFilter.indices
+    .filter { allCaloriesFilter[$0] < 400}
+    .map { "\(allDishes[$0]) - \(allCaloriesFilter[$0]) kcal"}
 
-
+print(lowCalorieDishes)
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: ["Tom Kha Soup", "Tom Yum Soup", "Thai Iced Tea"]
@@ -529,7 +579,7 @@ let allCaloriesFilter = [650, 420, 580, 280, 600, 320, 350, 120]
 // Exercise 3: ["Pad Thai", "Tom Kha Soup", "Spring Rolls", "Pad See Ew",
 //              "Mango Sticky Rice", "Thai Iced Tea"]
 // Exercise 4: ["Spring Rolls — $8.00", "Thai Iced Tea — $5.50"]
-// Exercise 5: ["Tom Kha Soup — 420 kcal", "Spring Rolls — 280 kcal",
+// Exercise 5: ["Spring Rolls — 280 kcal",
 //              "Tom Yum Soup — 320 kcal", "Mango Sticky Rice — 350 kcal",
 //              "Thai Iced Tea — 120 kcal"]
 
@@ -611,9 +661,9 @@ let orderAttempt = ["Pad Thai", "Burger", "Tom Kha", "Hot Dog", "Spring Rolls"]
 
 // 1. Use reduce to calculate the total revenue from tableAmounts
 //    Print: "Total revenue: $724.00"
-//
 // 2. Use reduce to find the highest single table amount
 //    Print: "Best table: $200.00"
+
 //
 // 3. Use reduce to build a comma-separated string of table amounts:
 //    "$85.50, $120.00, $45.00, $200.00, $95.00, $178.50"
@@ -631,7 +681,40 @@ let orderAttempt = ["Pad Thai", "Burger", "Tom Kha", "Hot Dog", "Spring Rolls"]
 
 // YOUR CODE BELOW:
 
+let totalTableAmounts = tableAmounts.reduce(0, +) 
+/* 
+let totalTableAmounts = tableAmounts.reduce(0) { total, item in 
+    // total + item
+} 
+*/
+print("Total revenue: $\(String(format: "%.2f", totalTableAmounts))")
+// 2
+let highestTableAmount = tableAmounts.reduce(0) { max($0, $1) }
+print("Best table: $\(String(format: "%.2f", highestTableAmount))")
+// 3
+let combinedOrder = tableAmounts.reduce("") { str, amount in 
+str.isEmpty ? "$\(String(format:"%.2f", amount))" : "\(str)," + " $\(String(format:"%.2f" ,amount))" 
+}
+print(combinedOrder)
+// 4
+let validTips = tipStrings.compactMap { Double($0) }
+print(validTips)
+let totalOfValidTips = validTips.reduce(0) { $0 + $1}
+print(totalOfValidTips)
+// 5
+let foundItems = orderAttempt.compactMap { itemLookup[$0] }
+print(foundItems)
+let totalOfFoundItems = foundItems.reduce(0) { $0 + $1 }  // What if I wanted to get the names of the valid
+print(totalOfFoundItems)
 
+let foundItems2 = orderAttempt.indices.compactMap { idx -> (String, Double)? in
+    guard let price = itemLookup[orderAttempt[idx]] else { return nil }
+    return (orderAttempt[idx], price)
+}
+
+for (name, price) in foundItems2 {
+    print("\(name) — $\(String(format: "%.2f", price))")
+}
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
