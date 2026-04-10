@@ -781,23 +781,6 @@ let staffWorkedToday = ["James", "Maria", "Carlos", "Tom", "Nina"]
 //    ... and so on
 //    HINT: sort staffRoster.keys and look up role + wage for each
 //
-let sortedStaffRoster = staffRoster.keys.sorted().map{ "\($0) - \(staffRoles[$0] ?? " ") - $\(String(format: "%.2f", staffRoster[$0] ?? 0))/hr"}
-for staff in sortedStaffRoster {
-    print(staff)
-}
-func getTodayStaffDetails(_ name: String) -> (name: String, role: String, hours: Double, pay: Double) {
-    let role = staffRoles[name] ?? ""
-    let hours = staffShiftHours[name] ?? 0.0
-    let rate = staffRoster[name] ?? 0.0
-    let pay = hours * rate
-    return (name, role, hours, pay)
-}
-
-for staff in staffWorkedToday {
-    let (name, role, hours, pay) = getTodayStaffDetails(staff)
-    print("\(name) | \(role) | \(String(format: "%.2f", hours)) hrs | $\(String(format: "%.2f", pay))")
-}
-
 // print(getTodayStaffDetails(name: "James"))
 // 2. TODAY'S SHIFT SUMMARY
 //    For each staff member who worked today (staffWorkedToday),
@@ -869,6 +852,71 @@ for staff in staffWorkedToday {
 // ── YOUR CODE BELOW ──────────────────────────────────────────
 
 
+// 1
+let sortedStaffRoster = staffRoster.keys.sorted().map{ "\($0) - \(staffRoles[$0] ?? " ") - $\(String(format: "%.2f", staffRoster[$0] ?? 0))/hr"}
+for staff in sortedStaffRoster {
+    print(staff)
+}
+// 2
+func getStaffDetails(_ name: String) -> (name: String, role: String, hours: Double, pay: Double) {
+    let role = staffRoles[name] ?? ""
+    let hours = staffShiftHours[name] ?? 0.0
+    let rate = staffRoster[name] ?? 0.0
+    let pay = hours * rate
+    return (name, role, hours, pay)
+}
+
+for staff in staffWorkedToday {
+    let (name, role, hours, pay) = getStaffDetails(staff)
+    print("\(name) | \(role) | \(String(format: "%.2f", hours)) hrs | $\(String(format: "%.2f", pay))")
+}
+// 3 
+let totalRevenueToday = staffWorkedToday.reduce(0.0) { total, staff in 
+    let (_, _, _, pay) = getStaffDetails(staff)
+    return total + pay
+}
+print("Total payroll today: $\(String(format: "%.2f", totalRevenueToday))")
+// 4
+let topEarners = staffRoster
+    .filter { $0.value > 20 }
+for name in topEarners.keys.sorted() {
+    print("High earner: \(name) - $\(String(format: "%.2f", topEarners[name] ?? 0))/hr")
+}
+// 5
+let totalHourlyWages = staffRoster.values.sorted()
+    // .map{ getStaffDetails($0)}
+    .reduce(0.0) {$0 + $1 }
+let employeeCount = staffRoster.count
+        
+print("Total hourly wage bill: \(String(format: "%.2f", totalHourlyWages))/hr")
+print("Average hourly wage: $\(String(format: "%.2f", totalHourlyWages / Double(employeeCount)))/hr")
+// 6
+var staffBreakdown: [String:Int] = [:]
+
+for name in staffRoles.keys {
+    staffBreakdown[staffRoles[name] ?? "", default: 0] += 1
+}
+
+print(staffBreakdown)
+// 7
+func shiftReport(name: String) -> (name: String, role: String, hours: Double, wage: Double, pay: Double)? {
+    let sanitizedName = name.capitalized
+    guard let wage = staffRoster[sanitizedName], let role = staffRoles[sanitizedName], let hours = staffShiftHours[sanitizedName] else { return nil }
+    let pay = wage * hours
+    return (sanitizedName, role, hours, wage, pay)
+}
+
+
+if let report = shiftReport(name: "nina") {
+    print("\(report.name) | \(report.role) | \(report.hours) hrs @ $\(String(format: "%.2f", report.wage))/hr = $\(String(format: "%.2f", report.pay))")
+} else {
+    print("Staff member not found")
+}
+if let report2 = shiftReport(name: "Unknown")  {
+    print("\(report2.name) | \(report2.role) | \(report2.hours) hrs @ $\(String(format: "%.2f", report2.wage))/hr = $\(String(format: "%.2f", report2.pay))")
+} else {
+    print("Staff member not found")
+}
 
 
 // ============================================================
