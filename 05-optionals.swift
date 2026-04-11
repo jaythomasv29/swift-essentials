@@ -266,6 +266,7 @@ if let price = menu["Pad Thai"] {
 // 1. Create an optional String called 'chefOfTheDay'
 //    set to "James"
 //    Force unwrap it and print it — it works because the value exists
+
 //
 // 2. Now set 'chefOfTheDay' to nil
 //    Comment out the force unwrap — confirm it would crash
@@ -278,8 +279,22 @@ if let price = menu["Pad Thai"] {
 //    Then write the safe version using if let
 
 // YOUR CODE BELOW:
+// 1
+var chefOfTheDay: String? = "James"
+print(chefOfTheDay!)
+// 2
+chefOfTheDay = nil
+// print(chefOfTheDay!)  // Force unwrap -> Fatal error: Unexpectedly found nil while unwrapping an Optional value
+// 3
+let specials: [String: String] = ["Monday": "Pad Thai", "Tuesday": "Green Curry"]
+print(specials)
+// print(specials["Wednesday"]!)  // Fatal error: Unexpectedly found nil while unwrapping an Optional value
 
-
+if let specialMenu = specials["Wednesday"] {
+    print("The special for Wednesday is: \(specialMenu)")
+} else {
+    print("There are no specials for Wednesday")
+}
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -287,7 +302,7 @@ if let price = menu["Pad Thai"] {
 // Exercise 2: code commented out with explanation of crash
 // Exercise 3: safe version prints nothing (Wednesday has no special)
 
-/*
+
 // ============================================================
 // TOPIC 4 — IF LET: SAFE UNWRAPPING
 // ============================================================
@@ -350,11 +365,11 @@ if let reservationGuest {
 var currentGuest: String? = "James"
 var currentTable: Int? = 7
 var currentDiscount: Double? = nil
-var loyaltyPoints: Int? = 150
+var loyaltyPoints: Int? = 100
 
 // 1. Use if let to print "Seating [name]" if currentGuest has a value
 //    If nil, print "Walk-in — no name on file"
-//
+
 // 2. Use if let to bind BOTH currentGuest and currentTable
 //    If both exist, print "James is at table 7"
 //    If either is nil, print "Incomplete reservation info"
@@ -375,7 +390,45 @@ var loyaltyPoints: Int? = 150
 
 // YOUR CODE BELOW:
 
-
+// 1
+// method 1
+if let name = currentGuest {
+    print("Seating \(name)!")
+}
+// method 2, easier, id probably go with this 99% of the time if the variable already exists outside and depending on scope
+if let currentGuest {  // shadowing method
+    print("Seating \(currentGuest)")
+}
+// 2
+if let currentGuest, let currentTable {  // shadowing and multiple bindings
+    print("\(currentGuest) is at table \(currentTable)")
+}
+// 3
+if let currentDiscount {
+    print("Discount applied: $\(String(format: "%.2f", currentDiscount))")
+} else {
+    print("No discount - full price applies")
+}
+// 4 (if let with multi-condition)
+if let pointTotal = loyaltyPoints, pointTotal > 100 {
+    print("VIP guest — \(pointTotal) points — complimentary appetizer")
+} else if let pointTotal = loyaltyPoints, pointTotal <= 100 {
+    print("Regular member - \(pointTotal) points")
+} else {
+    print("Not a loyalty member")
+}
+// 4  (shorthand way)
+if let loyaltyPoints, loyaltyPoints > 100 {
+    print("VIP guest — \(loyaltyPoints) points — complimentary appetizer")
+} else if let loyaltyPoints, loyaltyPoints <= 100 {
+    print("Regular member - \(loyaltyPoints) points")
+} else {
+    print("Not a loyalty member")
+}
+// 5 (same as above)
+if let currentGuest {
+    print(currentGuest)
+}
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -384,6 +437,7 @@ var loyaltyPoints: Int? = 150
 // Exercise 3: "No discount — full price applies"
 // Exercise 4: "VIP guest — 150 points — complimentary appetizer"
 // Exercise 5: prints "James"
+
 
 
 // ============================================================
@@ -466,6 +520,7 @@ func processOrderGuardLet(itemName: String?, price: Double?) {
 //    - guestName: String?
 //    - partySize: Int?
 //    - tableNumber: Int?
+
 //
 //    Use guard let for each parameter.
 //    If any is nil, print an appropriate message and return.
@@ -489,8 +544,25 @@ func processOrderGuardLet(itemName: String?, price: Double?) {
 //    If any check fails, print an error and return 0.0
 
 // YOUR CODE BELOW:
+func processReservation(guestName: String?, partySize: Int?, tableNumber: Int?) {
+    guard let guestName else { print("Reservation failed: No reservation name provided"); return }
+    guard let partySize else { print("Reservation failed: No party size provided"); return }
+    guard let tableNumber else { print("Reservation failed: No table available"); return }
 
+    print("We have gone ahead and booked your reservation for \(guestName) - \(partySize) at table \(tableNumber)")
+}
+   processReservation(guestName: "James", partySize: 4, tableNumber: 7)
+   processReservation(guestName: nil, partySize: 4, tableNumber: 7)
+   processReservation(guestName: "Sarah", partySize: nil, tableNumber: 3)
+   processReservation(guestName: "Carlos", partySize: 2, tableNumber: nil)
 
+func calculateTip(subtotal: Double?, tipPercentage: Double?) -> Double {
+    guard let subtotal, let tipPercentage else { print("Missing fields in order to calculate tip"); return 0.0 }
+    guard subtotal > 0 else { print("Subtotal must be greater than 0"); return 0.0 }
+    let tipAmount = subtotal * tipPercentage
+    print("Tip: $\(String(format: "%.2f", tipAmount)) on a $\(String(format: "%.2f", subtotal)) bill")
+    return tipAmount
+}
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -498,9 +570,9 @@ func processOrderGuardLet(itemName: String?, price: Double?) {
 // processReservation(nil, 4, 7): error message for missing name
 // processReservation("Sarah", nil, 3): error message for missing party size
 // processReservation("Carlos", 2, nil): error message for missing table
-// calculateTip(80.00, 0.18): "Tip: $14.40 on a $80.00 bill"
+print(String(format: "%.2f", calculateTip(subtotal: 80.00, tipPercentage: 0.18)))// "Tip: $14.40 on a $80.00 bill"
 
-
+/*
 // ============================================================
 // TOPIC 6 — NIL COALESCING: ?? DEFAULT VALUE
 // ============================================================
