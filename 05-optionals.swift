@@ -20,7 +20,7 @@
 
 import Foundation
 
-
+/*
 // ============================================================
 // TOPIC 1 — WHAT IS NIL AND WHY SWIFT HANDLES IT DIFFERENTLY
 // ============================================================
@@ -91,7 +91,7 @@ var walkInName: String? = nil
 
 // YOUR CODE BELOW:
 // 1
-/*
+
 let kitchenStatus: String = "Open"
 kitchenStatus = nil; // well we used let as well as declaring it to be a value, AND a String without an optional cannot be nil
 
@@ -109,7 +109,7 @@ var discountAmount: Double? = nil  // nil
 print(discountAmount)
 print(discountAmount != nil ? "You got a discount" : "no discount available")
 
-*/
+
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: compiler error when you try to assign nil to String
@@ -118,7 +118,7 @@ print(discountAmount != nil ? "You got a discount" : "no discount available")
 // Exercise 4: Optional(7)
 // Exercise 5: nil
 
-/*
+
 // ============================================================
 // TOPIC 2 — DECLARING OPTIONALS WITH ?
 // ============================================================
@@ -215,7 +215,7 @@ print(type(of: "hello world")) // String
 // type of phoneNumber: Optional<String>
 // type of plain string: String
 
-*/
+
 
 // ============================================================
 // TOPIC 3 — FORCE UNWRAPPING WITH ! (AND WHY TO AVOID IT)
@@ -572,7 +572,7 @@ func calculateTip(subtotal: Double?, tipPercentage: Double?) -> Double {
 // processReservation("Carlos", 2, nil): error message for missing table
 print(String(format: "%.2f", calculateTip(subtotal: 80.00, tipPercentage: 0.18)))// "Tip: $14.40 on a $80.00 bill"
 
-/*
+
 // ============================================================
 // TOPIC 6 — NIL COALESCING: ?? DEFAULT VALUE
 // ============================================================
@@ -641,6 +641,7 @@ var emergencyTable: Int = 1
 // 2. Print a welcome message using both guestTitle and preferredTable:
 //    "Welcome, [title]! Your table is [number]."
 //    Use ?? for both — title defaults to "Guest", table defaults to 0
+
 //
 // 3. Calculate a final bill of $95.00 minus any meal credit.
 //    If no credit exists, the full amount is charged.
@@ -656,6 +657,21 @@ var emergencyTable: Int = 1
 //    "Loyalty status: Gold" or "Loyalty status: No membership"
 
 // YOUR CODE BELOW:
+// 1
+print(guestTitle ?? "Guest")
+// 2
+print("Welcome, \(guestTitle ?? "Guest")! Your table is \(preferredTable ?? 0)")
+// 3
+let totalBill = 95.00
+print("Final bill: \(String(format:"%.2f" , totalBill - (mealCredit ?? 0)))")
+// 4
+preferredTable = nil
+backupTable = nil
+let availableTable = preferredTable ?? backupTable ?? emergencyTable
+print("The next available table is table: \(availableTable)")
+// 5
+loyaltyTier = nil  // testing inline ??
+print("Loyalty status: \(loyaltyTier ?? "No membership")")
 
 
 
@@ -752,7 +768,7 @@ var busser = StaffMember2(name: "Derek", contact: nil, manager: server)
 //
 // 2. Print the server's email using optional chaining + ??
 //    "Contact: maria@thaikitchen.com" or "No email on file"
-//
+
 // 3. Print the busser's manager's name using optional chaining
 //    (busser → manager is server → name is "Maria")
 //
@@ -764,6 +780,21 @@ var busser = StaffMember2(name: "Derek", contact: nil, manager: server)
 //    Use ?? to print "No email" if nil
 
 // YOUR CODE BELOW:
+
+// 1
+print(busser.contact?.phone) // nil
+// 2
+let serverEmail = (server.contact?.email)  // maria@thaikitchen.com
+print("Contact: \(serverEmail)" ?? "No email on file")
+// 3 
+let busserManager = busser.manager?.name // Maria
+print(busserManager ?? "Manager does not exist")
+// 4 
+let bussersMgmtManager = busser.manager?.manager?.name
+print(bussersMgmtManager ?? "Manager does not exist")
+// 5
+let busserContact = busser.contact?.email
+print(busserContact ?? "No email")
 
 
 
@@ -839,6 +870,28 @@ print(restaurant.headChef)  // "Chef James" — no Optional wrapper
 // ── YOUR TURN ────────────────────────────────────────────────
 // 1. Create an IUO called 'primaryServer' of type String!
 //    Set it to "Nina". Print it — notice no Optional() wrapper.
+// 1
+let primaryServer: String! = "Nina"
+// 2
+let backupServer: String? = "Carlos"
+print(primaryServer)
+print(backupServer)
+// 3
+class KitchenStation {
+    var stationName: String
+    var assignedChef: String!
+
+    init(stationName: String) {
+        self.stationName = stationName
+    }
+}
+
+let station = KitchenStation(stationName: "Front")
+station.assignedChef = "Bobby Flay"
+print(station.assignedChef)
+
+// 4
+
 //
 // 2. Create a regular optional 'backupServer' of type String?
 //    Set it to "Carlos". Print both primaryServer and backupServer.
@@ -865,7 +918,7 @@ print(restaurant.headChef)  // "Chef James" — no Optional wrapper
 // Exercise 3: chef name prints without Optional wrapper
 // Exercise 4: comment in your own words
 
-
+*/
 // ============================================================
 //
 //  🏆 CHAPTER 5 CHALLENGE: SAFE MENU LOOKUP
@@ -937,6 +990,25 @@ let guestLoyaltyTiers: [String: String] = [
 //    "Green Curry — $16.00 — calories: not on file — no allergens listed"
 //    "Burger — not on menu"
 //
+func lookupItem(_ name: String) -> (price: Double, calories: Int?, allergens: String?)? {
+    guard let price = menuItems[name] else { return nil }
+    let calories = itemCalories[name]
+    let allergens = itemAllergens[name]
+    return (price, calories, allergens)
+}
+func printItem(_ name: String) {
+    guard let (price, calories, allergens) = lookupItem(name) else {
+    print("Item not found")
+    return
+    }
+    let calStr = calories != nil ? "\(calories!) cal" : "calories: not on file"
+    // let calStr = calories.map { "\($0) cal" } ?? "calories: not on file"
+    let algStr = allergens ?? "No allergens listed"
+    print("\(name) - $\(String(format: "%.2f", price)) \(calStr) - \(algStr)")
+}
+printItem("Pad Thai")
+printItem("Green Curry")
+printItem("Burger")
 // 2. GUEST ORDER SUMMARY
 //    For each guest in guestOrders, look up each item they ordered.
 //    Use optional chaining and ?? to handle missing items gracefully.
@@ -946,6 +1018,36 @@ let guestLoyaltyTiers: [String: String] = [
 //    "  Thai Iced Tea — $5.50"
 //    "  Subtotal: $20.49"
 //    If an item isn't in the menu, print: "  [item] — not available"
+func getGuestOrder(_ name: String) -> (order: [String], total: Double)? {
+    guard let order = guestOrders[name] else { return nil }  // guard against if name isn't in dict
+    let validOrder = order.map { 
+        if let (price, _, _) = lookupItem($0) {
+            return "\($0) - $\(String(format: "%.2f" ,price))"
+        } else {
+            return "\($0) - not available" 
+            }
+        }
+        let total = order.reduce(0.0) { total, item in 
+            total + (menuItems[item] ?? 0.0)
+         }
+    return (validOrder, total)
+}
+
+func printGuestOrder(_ name: String) {
+    guard let (order, total) = getGuestOrder(name) else {
+        print("No order found")
+        return
+    }
+    print("── \(name)'s order ──")
+    for item in order {
+        print(item)
+    }
+    print("Subtotal: $\(String(format: "%.2f", total))")
+}
+
+printGuestOrder("James")
+printGuestOrder("Sarah")
+printGuestOrder("Carlos")
 //
 // 3. BILL CALCULATION WITH DISCOUNTS
 //    For each guest, calculate their final bill:
@@ -1000,7 +1102,7 @@ let guestLoyaltyTiers: [String: String] = [
 //
 // ── YOUR CODE BELOW ──────────────────────────────────────────
 
-*/
+
 
 
 // ============================================================
