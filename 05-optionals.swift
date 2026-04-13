@@ -990,25 +990,6 @@ let guestLoyaltyTiers: [String: String] = [
 //    "Green Curry — $16.00 — calories: not on file — no allergens listed"
 //    "Burger — not on menu"
 //
-func lookupItem(_ name: String) -> (price: Double, calories: Int?, allergens: String?)? {
-    guard let price = menuItems[name] else { return nil }
-    let calories = itemCalories[name]
-    let allergens = itemAllergens[name]
-    return (price, calories, allergens)
-}
-func printItem(_ name: String) {
-    guard let (price, calories, allergens) = lookupItem(name) else {
-    print("Item not found")
-    return
-    }
-    let calStr = calories != nil ? "\(calories!) cal" : "calories: not on file"
-    // let calStr = calories.map { "\($0) cal" } ?? "calories: not on file"
-    let algStr = allergens ?? "No allergens listed"
-    print("\(name) - $\(String(format: "%.2f", price)) \(calStr) - \(algStr)")
-}
-printItem("Pad Thai")
-printItem("Green Curry")
-printItem("Burger")
 // 2. GUEST ORDER SUMMARY
 //    For each guest in guestOrders, look up each item they ordered.
 //    Use optional chaining and ?? to handle missing items gracefully.
@@ -1018,36 +999,6 @@ printItem("Burger")
 //    "  Thai Iced Tea — $5.50"
 //    "  Subtotal: $20.49"
 //    If an item isn't in the menu, print: "  [item] — not available"
-func getGuestOrder(_ name: String) -> (order: [String], total: Double)? {
-    guard let order = guestOrders[name] else { return nil }  // guard against if name isn't in dict
-    let validOrder = order.map { 
-        if let (price, _, _) = lookupItem($0) {
-            return "\($0) - $\(String(format: "%.2f" ,price))"
-        } else {
-            return "\($0) - not available" 
-            }
-        }
-        let total = order.reduce(0.0) { total, item in 
-            total + (menuItems[item] ?? 0.0)
-         }
-    return (validOrder, total)
-}
-
-func printGuestOrder(_ name: String) {
-    guard let (order, total) = getGuestOrder(name) else {
-        print("No order found")
-        return
-    }
-    print("── \(name)'s order ──")
-    for item in order {
-        print(item)
-    }
-    print("Subtotal: $\(String(format: "%.2f", total))")
-}
-
-printGuestOrder("James")
-printGuestOrder("Sarah")
-printGuestOrder("Carlos")
 //
 // 3. BILL CALCULATION WITH DISCOUNTS
 //    For each guest, calculate their final bill:
@@ -1059,7 +1010,6 @@ printGuestOrder("Carlos")
 //    "Sarah | subtotal: $X.XX | discount: 0% | total: $X.XX"
 //    "Carlos | subtotal: $0.00 | discount: none | total: $0.00"
 //    NOTE: Carlos ordered items not on the menu — subtotal is $0.00
-//
 // 4. LOYALTY STATUS
 //    For each guest, use optional chaining + ?? to print their
 //    loyalty status and tier:
@@ -1101,7 +1051,119 @@ printGuestOrder("Carlos")
 // → Requirement 5: use .contains() to check item names
 //
 // ── YOUR CODE BELOW ──────────────────────────────────────────
+func lookupItem(_ name: String) -> (price: Double, calories: Int, allergens: String)? {
+    guard let price = menuItems[name] else { return nil }
+    let calories = itemCalories[name]
+    let allergens = itemAllergens[name]
+    return (price, calories, allergens)
+}
+func printItem(_ name: String) {
+    guard let (price, calories, allergens) = lookupItem(name) else {
+    print("Item not found")
+    return
+    }
+    let calStr = calories != nil ? "\(calories) cal" : "calories: not on file"
+    // let calStr = calories.map { "\($0) cal" } ?? "calories: not on file"
+    let algStr = allergens ?? "No allergens listed"
+    print("\(name) - $\(String(format: "%.2f", price)) \(calStr) - \(algStr)")
+}
+printItem("Pad Thai")
+printItem("Green Curry")
+printItem("Burger")
 
+func getGuestOrder(_ name: String) -> (order: [String], total: Double)? {
+    guard let order = guestOrders[name] else { return nil }  // guard against if name isn't in dict
+    let validOrder = order.map { 
+        if let (price, _, _) = lookupItem($0) {
+            return "\($0) - $\(String(format: "%.2f" ,price))"
+        } else {
+            return "\($0) - not available" 
+            }
+        }
+        let total = order.reduce(0.0) { total, item in 
+            total + (menuItems[item] ?? 0.0)
+         }
+    return (validOrder, total)
+}
+
+func printGuestOrder(_ name: String) {
+    guard let (order, total) = getGuestOrder(name) else {
+        print("No order found")
+        return
+    }
+    print("── \(name)'s order ──")
+    for item in order {
+        print(item)
+    }
+    print("Subtotal: $\(String(format: "%.2f", total))")
+}
+
+printGuestOrder("James")
+printGuestOrder("Sarah")
+printGuestOrder("Carlos")
+
+func calculateBill(_ name: String) -> (subtotal: Double, discount: Double?, total: Double)? {
+    guard let (_, total) = getGuestOrder(name) else { return nil }
+    let discount = guestDiscounts[name]
+    let finalTotal = total * (1 -  (discount ?? 0))
+    return (total, discount, finalTotal)
+}
+
+func printCalculatedBill(_ name: String) {
+    guard let (subtotal, discount, total) = calculateBill(name) else { 
+        print("Bill does not exist")
+        return 
+    }
+    if let discount {
+    print("\(name) | subtotal: $\(String(format: "%.2f", subtotal)) | discount: \(Int(discount * 100))% | total: $\(String(format: "%.2f", total))")
+    } else {
+        print("\(name) | subtotal: $\(String(format: "%.2f", subtotal)) | discount: none | total: $\(String(format: "%.2f", total))")
+    }
+}
+
+printCalculatedBill("James")
+printCalculatedBill("Sarah")
+printCalculatedBill("Carlos")
+
+// 4
+func getLoyaltyStatus(name: String) -> (tier: String, discount: Double)? {
+    guard let tier = guestLoyaltyTiers[name] else { return nil }
+    let discount = guestDiscounts[name] ?? 0
+    return (tier, discount)
+}
+
+func printLoyaltyStatus(_ name: String) {
+    guard let (tier, discount) = getLoyaltyStatus(name: name) else {
+        print("\(name) - not a loyalty member")
+        return
+    }
+    let rate = discount * 100
+        print("\(name) - \(tier) member - \(Int(rate))% discount")
+} 
+
+printLoyaltyStatus("James")
+printLoyaltyStatus("Sarah")
+printLoyaltyStatus("Carlos")
+
+// 5
+func chefRecommendation(name: String) -> String? {
+    guard let order = guestOrders[name] else { return nil}
+    // if we see any menu item that contains 'pad thai' or 'tom' in the name 
+    for item in order {
+        if item.contains("Pad Thai") {
+            return "Recommendation for \(name): Try our Green Curry next time"
+        } else if item.contains("Tom") {
+            return "Recommendation for \(name): You might enjoy our Tom Yum Soup"
+        }
+    }
+    return nil
+}
+
+// caller:
+for name in guestOrders.keys.sorted() {
+    let rec = chefRecommendation(name: name) ?? "no recommendation at this time"
+    print("Recommendation for \(name): \(rec)")
+}
 
 
 
