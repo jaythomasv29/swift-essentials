@@ -104,8 +104,29 @@ print(formatter(12.50))       // $12.50
 //    and call it through the variable with (100.00, 0.20)
 
 // YOUR CODE BELOW:
+// 1
+func closeKitchen() {
+    print("Thai Kitchen is now closed")
+    print("See you tomorrow!")
+}
+// 2
+func describeTable(tableNumber: Int, seats: Int, isOccupied: Bool) {
+    print("Table \(tableNumber) — \(seats) seats — \(isOccupied ? "occupied" : "available")")
+}
 
+describeTable(tableNumber: 3, seats: 4, isOccupied: false)
 
+// 3
+func calculateTip(subtotal: Double, rate: Double) -> Double {
+    return subtotal * rate
+}
+print(String(format: "%.2f", calculateTip(subtotal: 80.00, rate: 0.18)))
+//4
+func calculateTip2(subtotal: Double, rate: Double) -> Double { subtotal * rate }
+print(String(format: "%.2f", calculateTip2(subtotal: 80.00, rate: 0.18)))  //implicit return - single line
+//5
+let tipCalculator = calculateTip
+print(tipCalculator(100.00, 0.20))
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
@@ -168,7 +189,6 @@ print(findPrice(for: "Burger") ?? 0)     // 0
 //    - unitPrice: Double
 //    Returns a formatted String: "2x Pad Thai — $29.98"
 //    Use the formatPrice function from Topic 1
-//
 // 2. Write a function called 'isTableAvailable' that takes
 //    - tableNumber: Int
 //    - occupiedTables: [Int]
@@ -177,7 +197,6 @@ print(findPrice(for: "Burger") ?? 0)     // 0
 // 3. Write a function called 'lookupWage' that takes
 //    - staffName: String
 //    Returns Double? — the wage from this dictionary:
-let wageTable = ["James": 24.00, "Maria": 19.00, "Carlos": 21.00]
 //    Return nil if the staff member isn't found
 //    Call it for "James" and "Derek" — unwrap safely with ?? or if let
 //
@@ -188,7 +207,42 @@ let wageTable = ["James": 24.00, "Maria": 19.00, "Carlos": 21.00]
 //    Example: 10 hours at $20/hr = (8 * 20) + (2 * 30) = $220.00
 
 // YOUR CODE BELOW:
+// 1
+func formatLineItem(name: String, quantity: Int, unitPrice: Double) -> String {
+    return "\(quantity)x \(name) - \(formatPrice(unitPrice * Double(quantity)))"
+}
+print(formatLineItem(name: "Pad Thai", quantity: 2, unitPrice: 14.99))
+//
+// 2
+func isTableAvailable(tableNumber: Int, occupiedTables: [Int]) -> Bool {
+    return !occupiedTables.contains(tableNumber)
+}
+print(isTableAvailable(tableNumber: 7, occupiedTables: [1,2,3,4]))  // 7 is not occupied
+// 3
+let wageTable = ["James": 24.00, "Maria": 19.00, "Carlos": 21.00]
+func lookupWage(staffName: String) -> Double? {
+    return wageTable[staffName]
+}
 
+if let wage = lookupWage(staffName: "James") {
+    print(wage)
+} else {
+    print("no wage found")
+}
+print(lookupWage(staffName: "Derek") ?? "No wage found")
+// 4
+func overtimeRate(hoursWorked: Double, hourlyRate: Double) -> Double {
+    if hoursWorked <= 8 {
+        return hourlyRate * hoursWorked
+    } else {
+        let overtimeHours = hoursWorked - 8 //everything over 8 hours is overtime
+        let overtimeRate = hourlyRate * 1.5
+        let regularHours = hoursWorked - overtimeHours
+        return (overtimeRate * overtimeHours) + (hourlyRate * regularHours)
+    }
+}
+
+print("\(formatPrice(overtimeRate(hoursWorked: 10, hourlyRate: 20)))")
 
 
 
