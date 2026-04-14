@@ -333,6 +333,26 @@ move("Pad Thai", to: "specials board")   // reads naturally
 //    Call it: charge(85.00, to: "James")
 
 // YOUR CODE BELOW:
+// 1
+func assign(_ server: String, to table: Int) {
+    print("Assigning \(server) to table \(table)")
+}
+assign("Maria", to: 5)  // Assigning Maria to table 5
+// 2
+func apply(discount rate: Double, to subtotal: Double) -> Double {
+    return subtotal * (1 - rate)
+}
+print(String(format: "%.2f", apply(discount: 0.10, to: 85.00)))
+// 3
+func transfer(guest name: String, from currentTable: Int, to newTable: Int) {
+    print("Transferring \(name) from table \(currentTable) to \(newTable)")
+}
+transfer(guest: "James", from: 3, to: 7)
+// 4
+func charge(_ amount: Double, to guestName: String) {
+    print( "Charging $\(String(format:"%.2f", amount)) to \(guestName)")
+}
+charge(85, to: "James")
 
 
 
@@ -421,7 +441,27 @@ greetStaff("Maria")                    // Welcome, Maria — Team Member
 //    Test all combinations
 
 // YOUR CODE BELOW:
-
+// 1
+func makeReservation(name: String, partySize: Int, time: String = "7:00 PM", occasion: String = "none") {
+    print("Reservation: \(name), party of \(partySize), \(time), occasion: \(occasion)")
+}
+   makeReservation(name: "James", partySize: 4)
+   makeReservation(name: "Sarah", partySize: 2, time: "8:30 PM")
+   makeReservation(name: "Carlos", partySize: 6, time: "7:00 PM", occasion: "birthday")
+// 2
+func formatCurrency(_ amount: Double, symbol: String = "$", decimals: Int = 2) -> String {
+    return "\(symbol)\(String(format: "%.\(decimals)f", amount))"
+}
+print(formatCurrency(14.99))              // → "$14.99"
+print(formatCurrency(14.99, symbol: "€")) // → "€14.99"
+print(formatCurrency(14.99, decimals: 0)) // → "$15"  ← rounded
+// 3
+func staffGreeting(_ name: String, shift: String = "evening", isManager: Bool = false) {
+    print("Hi \(name), have a great \(shift) shift\(isManager ? ", boss":"")!")
+}
+staffGreeting("James", shift: "evening", isManager: true)
+staffGreeting("Lara")
+staffGreeting("Bob", shift: "evening")
 
 
 
@@ -520,8 +560,45 @@ if let staff = findStaff(named: "Unknown") {
 //    message = "Order confirmed" or the specific error
 //    total = price * quantity or 0.0 if invalid
 
-// YOUR CODE BELOW:
 
+// YOUR CODE BELOW:
+//1
+func shiftPay(_ name: String, _ hoursWorked: Double, _ hourlyRate: Double) -> (regularPay: Double, overtimePay: Double, totalPay: Double) {
+    guard hoursWorked > 8 else { 
+        // regular pay
+        let pay = hoursWorked * hourlyRate
+        return (pay, 0.0, pay)
+    } 
+    // overtime pay
+    let regularPay = 8 * hourlyRate
+    let overtimeHours = hoursWorked - 8
+    let overtimePay = overtimeHours * (hourlyRate * 1.5)
+    return ( regularPay, overtimePay, regularPay + overtimePay)
+}
+let payday = shiftPay("James", 10.0, 24.00)
+print("James - regular: \(formatPrice(payday.regularPay)) - overtime: \(formatPrice(payday.overtimePay)) - total: \(formatPrice(payday.totalPay))")
+// 2 
+func menuStats(prices: [Double]) -> (min: Double, max: Double, average: Double, total: Double)? {
+    // guard to ensure it is not empty
+    guard !prices.isEmpty else { return nil }
+    let total = prices.reduce(0, +)
+    guard let min = prices.min(), let max = prices.max() else { return nil }
+    return (min, max, total / Double(prices.count), total)
+}
+let menuPrices = [14.99, 12.50, 8.00, 5.50, 16.00]
+// print(menuStats(prices: menuPrices))
+// 3
+func validateOrder(itemName: String, quantity: Int) -> (isValid: Bool, message: String, total: Double) {
+    let menu = ["Pad Thai": 14.99, "Tom Kha": 12.50, "Spring Rolls": 8.00]
+    guard quantity > 0 else { return (false, "Invalid quantity", 0.0)
+    }
+    guard let item = menu[itemName] else { return (false, "Invalid menu item", 0.0) }
+    
+    return (true, "Order confirmed", (item * Double(quantity)))
+}
+print(validateOrder(itemName: "Pad Thai", quantity: 2))
+print(validateOrder(itemName: "Pad Thai", quantity: 0))
+print(validateOrder(itemName: "Burger", quantity: 3))
 
 
 
@@ -602,7 +679,6 @@ for op in operations {
 //    Store both in a variable called 'priceAdjustment' (type: (Double) -> Double)
 //    Apply tax first, then switch to discount and apply that
 //    Print both results for a $80.00 bill
-//
 // 2. Write a function 'transform(_ prices: [Double], using operation: (Double) -> Double) -> [Double]'
 //    that applies an operation to every price in the array and returns the result
 //    Test it with applyTax and applyDiscount on [14.99, 12.50, 8.00]
@@ -618,7 +694,41 @@ for op in operations {
 //    Print the result of each
 
 // YOUR CODE BELOW:
+// 1
+func applyTax(_ amount: Double) -> Double { amount * 1.0875 }
+func applyDiscount(_ amount: Double) -> Double { amount * 0.90 }
 
+var priceAdjustment: (Double) -> Double = applyTax
+let totalAfterTax = priceAdjustment(80.00)
+// print("Subtotal after tax: \(formatCurrency(totalAfterTax))")
+priceAdjustment = applyDiscount
+let totalAfterTaxAndDiscount = priceAdjustment(totalAfterTax)
+print("Subtotal after tax and discount: \(formatCurrency(totalAfterTaxAndDiscount))")  // I got a total of $78.30 -> (80 * 1.0875) * 0.90
+// 2
+func transform(_ prices: [Double], operation: (Double) -> Double) -> [Double] {
+    return prices.map(operation)
+}
+print(transform([14.99, 12.50, 8.00], operation: applyTax))
+print(transform([14.99, 12.50, 8.00], operation: applyDiscount))
+// 3
+func makeDiscounter(_ rate: Double) -> (Double) -> Double {
+    func applyDiscount(_ amount: Double) -> Double {
+        return (1 - rate) * amount
+    }
+    return applyDiscount
+}
+let discountBy15 = makeDiscounter(0.15)
+print(discountBy15(100))
+let discountBy25 = makeDiscounter(0.25)
+print(discountBy25(100))
+// 4
+let adjustments = [applyTax, applyDiscount, makeDiscounter(0.50)]
+ for operation in adjustments {
+    print(formatCurrency(operation(50)))
+ }
+// 54.37499999999999
+// 45.0
+// 25.0
 
 
 
@@ -654,13 +764,14 @@ for op in operations {
 // ── EXAMPLES ─────────────────────────────────────────────────
 
 // without @discardableResult — warning if you don't use return value
+@discardableResult
 func addToQueue(item: String) -> Int {
     print("Added \(item) to queue")
     return 42   // queue position — sometimes useful, sometimes not
 }
 
 // this would produce: "Result of call to 'addToQueue' is unused"
-// addToQueue(item: "Pad Thai")
+addToQueue(item: "Pad Thai")
 
 // with @discardableResult — no warning
 @discardableResult
@@ -691,7 +802,7 @@ let entry = logTransaction(amount: 15.00, type: "tip")  // result kept for audit
 //    WITHOUT @discardableResult — call it without storing the result
 //    and notice the warning.
 //    Then add @discardableResult and confirm the warning disappears.
-//
+
 // 2. Write a function 'processPayment(amount: Double) -> Bool'
 //    marked with @discardableResult
 //    Always returns true (simulating successful payment)
@@ -706,7 +817,39 @@ let entry = logTransaction(amount: 15.00, type: "tip")  // result kept for audit
 //    Call it again storing the result (for emailing)
 
 // YOUR CODE BELOW:
+// 1
+@discardableResult
+func recordSale(amount: Double, table: Int) -> String {
+    print("Sale recorded: \(formatCurrency(amount)) at table \(table)")
+    return "TABLE\(table): \(formatCurrency(amount))"
+}
+recordSale(amount: 42.00, table: 14)  // warning disappears after added
+// 2
+@discardableResult
+func processPayment(amount: Double) -> Bool {
+    print("Payment of \(formatCurrency(amount)) processed")
+    return true
+}
+processPayment(amount: 10.00)
+let paymentResult = processPayment(amount: 50.00)
+// 3
+@discardableResult
+func buildReceipt(items: [String], total: Double) -> String {
+    guard !items.isEmpty, total > 0 else { 
+        print("No items in order")
+        return "No items in order" 
+    }
+    let receipt = items.reduce("") {order, item in 
+        return order.isEmpty ? item : "\(order), \(item)"
+    }
+    let receiptStr = "\(receipt) : Total: \(formatCurrency(total))"
+    print(receiptStr)
+    return receiptStr
+}
 
+buildReceipt(items: ["Pad Thai"], total: 14.99)
+buildReceipt(items: ["Pad Thai", "Som Tum"], total: 34.99)
+buildReceipt(items: ["Pad Thai", "Som Tum"], total: 0)
 
 
 
@@ -732,31 +875,7 @@ let entry = logTransaction(amount: 15.00, type: "tip")  // result kept for audit
 // argument labels, defaults, tuples, functions as values,
 // and @discardableResult.
 //
-// ── INPUT DATA ───────────────────────────────────────────────
 
-let tableOrders: [Int: [String: Int]] = [
-    // tableNumber: [itemName: quantity]
-    1: ["Pad Thai": 2, "Thai Iced Tea": 2],
-    2: ["Green Curry": 1, "Tom Kha Soup": 2, "Spring Rolls": 3],
-    3: ["Pad Thai": 1, "Pad See Ew": 1]
-]
-
-let prices: [String: Double] = [
-    "Pad Thai": 14.99,
-    "Tom Kha Soup": 12.50,
-    "Green Curry": 16.00,
-    "Spring Rolls": 8.00,
-    "Thai Iced Tea": 5.50,
-    "Pad See Ew": 14.99
-]
-
-let staffPayroll: [String: (hours: Double, rate: Double)] = [
-    "James":  (hours: 8.0, rate: 24.00),
-    "Maria":  (hours: 6.5, rate: 19.00),
-    "Carlos": (hours: 8.0, rate: 21.00),
-    "Nina":   (hours: 10.0, rate: 22.50),  // Nina worked overtime
-    "Derek":  (hours: 5.0, rate: 17.00)
-]
 
 // ── REQUIREMENTS ─────────────────────────────────────────────
 //
@@ -800,6 +919,136 @@ let staffPayroll: [String: (hours: Double, rate: Double)] = [
 //    Overtime: hours over 8 at rate × 1.5
 //    Return nil if staff member not found
 //    Test with all staff members
+//
+// 5. PAYROLL SUMMARY
+//    Write a function 'payrollSummary() -> (totalPay: Double, highestEarner: String)'
+//    Use calculatePayroll for each staff member
+//    Return the total payroll and the name of the highest earner
+//    Print: "Total payroll: $XXX.XX — Highest earner: Nina"
+//
+// ── INPUT DATA ───────────────────────────────────────────────
+
+let tableOrders: [Int: [String: Int]] = [
+    // tableNumber: [itemName: quantity]
+    1: ["Pad Thai": 2, "Thai Iced Tea": 2],
+    2: ["Green Curry": 1, "Tom Kha Soup": 2, "Spring Rolls": 3],
+    3: ["Pad Thai": 1, "Pad See Ew": 1]
+]
+
+let prices: [String: Double] = [
+    "Pad Thai": 14.99,
+    "Tom Kha Soup": 12.50,
+    "Green Curry": 16.00,
+    "Spring Rolls": 8.00,
+    "Thai Iced Tea": 5.50,
+    "Pad See Ew": 14.99
+]
+
+let staffPayroll: [String: (hours: Double, rate: Double)] = [
+    "James":  (hours: 8.0, rate: 24.00),
+    "Maria":  (hours: 6.5, rate: 19.00),
+    "Carlos": (hours: 8.0, rate: 21.00),
+    "Nina":   (hours: 10.0, rate: 22.50),  // Nina worked overtime
+    "Derek":  (hours: 5.0, rate: 17.00)
+]
+// 1
+func tableSubtotal(for tableNumber: Int) -> Double? {
+    guard let order = tableOrders[tableNumber] else {
+        return nil
+    }
+    let orderTotal = order.reduce(0.0){ total, pair in  
+            let (itemName, quantity) = pair
+            guard let price = prices[itemName] else { return total }
+            return total + (price *  Double(quantity))
+    }
+    return orderTotal
+}
+print(formatCurrency(tableSubtotal(for: 1) ?? 0))
+print(formatCurrency(tableSubtotal(for: 2) ?? 0))
+print(formatCurrency(tableSubtotal(for: 3) ?? 0))
+print(formatCurrency(tableSubtotal(for: 99) ?? 0))
+// 2
+func fullBill(for tableNumber: Int, tipRate: Double = 0.18, taxRate: Double = 0.0875) -> (subtotal: Double, tax: Double, tip: Double, total: Double)? {
+    guard let subtotal = tableSubtotal(for: tableNumber) else {
+        return nil
+    }
+    let tax = subtotal * taxRate
+    let tip = subtotal * tipRate
+    return (subtotal, tax, tip, subtotal + tax + tip)
+}
+print(fullBill(for: 1) ?? "No table")
+print(fullBill(for: 2, tipRate: 0.20) ?? "No table")
+// 3
+@discardableResult
+func printBill(for tableNumber: Int, tipRate: Double = 0.18) -> String? {
+    guard let tableOrder = tableOrders[tableNumber] else { return nil }
+    guard let (subtotal, tax, tip, total) = fullBill(for: tableNumber, tipRate: tipRate) else { return nil }
+    var receipt = "── Table \(tableNumber)  ─────────────────────\n"
+    for order in tableOrder { 
+        let (itemName, quantity) = order
+    guard let price = prices[itemName] else {  print("Item unavailable"); continue} 
+        let receiptLine = "\(quantity)x \(itemName)    \(formatCurrency(price * Double(quantity)))"
+        receipt += "\(receiptLine)\n" 
+        // print(receiptLine)
+    }
+    receipt += "  ────────────────────────\n"
+    receipt += "  Subtotal:         \(formatCurrency(subtotal))\n"
+    receipt += "  Tax (8.75%):          \(formatCurrency(tax))\n"
+    receipt += "  Tip (\(Int(tipRate * 100))%):          \(formatCurrency(tip))\n"
+    receipt += "  ────────────────────────\n"
+    receipt += "  TOTAL:      \(formatCurrency(total))\n"
+    print(receipt)
+    return receipt
+}
+printBill(for: 1)
+printBill(for: 2)
+printBill(for: 3)
+let savedReceipt = printBill(for: 1)
+print("Receipt saved:\n \(savedReceipt ?? "")")
+// 4
+func calculatePayroll(_ name: String) -> (name: String, hours: Double, regularPay: Double, overtimePay: Double, totalPay: Double)? {
+    guard let (hours, rate) = staffPayroll[name] else { return nil }  // guard against staff member not found
+     if hours <= 8 {
+    let regularPay = hours * rate
+        return (name, hours, hours * rate, 0.0, regularPay)
+    }
+    // case where there is overtime pay
+    let maxRegularPay = 8.0 * rate
+    let overtimeHours = hours - 8.0
+    let overtimePay = overtimeHours * (rate * 1.5)
+    return (name, hours, maxRegularPay, overtimePay, (overtimePay + maxRegularPay))
+}
+// 5
+func payrollSummary() -> (totalPay: Double, highestEarner: String) {
+var topEarner = (name: "", totalPay: -1.0)
+var totalPayroll = 0.0
+for staff in staffPayroll.keys.sorted() {
+    if let (name, _, _, _, totalPay) = calculatePayroll(staff){
+
+        totalPayroll += totalPay
+        
+        if(topEarner.totalPay < totalPay) {
+            topEarner.name = name
+            topEarner.totalPay = totalPay
+        } 
+    }
+}
+return (totalPayroll, topEarner.name)
+}
+let payroll = payrollSummary()
+print("Total payroll: \(formatCurrency(payroll.totalPay)) - Highest earner: \(payroll.highestEarner)")
+// 6
+func makeAdjuster(_ multiplier: Double) -> (Double) -> Double {
+    func multiply(_ price: Double) -> Double {
+            return price * multiplier
+    }
+    return multiply
+}
+
+let happyHourAdjuster = makeAdjuster(0.2)
+print(formatCurrency(happyHourAdjuster(100.00)))
+let largePartyAdjuster = makeAdjuster(1.15)
+print(formatCurrency(largePartyAdjuster(100.00)))
 //
 // 5. PAYROLL SUMMARY
 //    Write a function 'payrollSummary() -> (totalPay: Double, highestEarner: String)'
