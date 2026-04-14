@@ -1045,10 +1045,19 @@ func makeAdjuster(_ multiplier: Double) -> (Double) -> Double {
     return multiply
 }
 
-let happyHourAdjuster = makeAdjuster(0.2)
-print(formatCurrency(happyHourAdjuster(100.00)))
+let happyHourAdjuster = makeAdjuster(0.80)
+if let table1Subtotal = tableSubtotal(for: 1) {
+    print(formatCurrency(happyHourAdjuster(table1Subtotal)))
+} else {
+    print("Table does not exist")
+}
 let largePartyAdjuster = makeAdjuster(1.15)
-print(formatCurrency(largePartyAdjuster(100.00)))
+
+if let table1Subtotal = tableSubtotal(for: 1) {
+print(formatCurrency(largePartyAdjuster(table1Subtotal)))
+} else {
+    print("Table does not exist")
+}
 //
 // 5. PAYROLL SUMMARY
 //    Write a function 'payrollSummary() -> (totalPay: Double, highestEarner: String)'
