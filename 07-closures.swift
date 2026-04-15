@@ -28,7 +28,22 @@ import Foundation
 // ── CONCEPT ──────────────────────────────────────────────────
 // A closure is a function without a name.
 // That's it. Everything else follows from that.
-//
+/*
+
+A closure is a block of code plus the environment it was created in.
+
+Three forms:
+→ Named function        func double(_ n: Double) -> Double { n * 2 }
+→ Stored closure        let double = { (n: Double) -> Double in n * 2 }
+→ Inline closure        [1,2,3].map { $0 * 2 }
+
+Scoping rules:
+→ Inner can read and write outer variables (live reference)
+→ Outer cannot see inner variables
+→ Captured variables stay alive as long as the closure exists
+→ All variables declared inside the closure are private to the outside
+
+*/
 // In JavaScript you call these arrow functions or anonymous functions:
 //   const double = (n) => n * 2
 //   [1,2,3].map(n => n * 2)
@@ -88,6 +103,7 @@ describeKitchen()   // Our kitchen uses organic produce ← captures current val
 //    Print the result of calling it with "pad thai"
 //    Expected: "→ Pad Thai ←"
 //
+
 // 2. Write a closure stored in 'applyDiscount'
 //    Takes a Double, returns a Double
 //    Applies a 15% discount (multiply by 0.85)
@@ -99,10 +115,27 @@ describeKitchen()   // Our kitchen uses organic produce ← captures current val
 //    Call it, then change discountMessage to "happy hour — 20% off drinks"
 //    Call it again — confirm it prints the updated message
 
+
+/* EXERCISE 1
 // YOUR CODE BELOW:
+// 1
+let formatMenuItem = { (itemName: String)  -> String in
+    return "→ \(itemName.capitalized) ←"
+}
+print(formatMenuItem("Pad Thai"))
+// 2
+let applyDiscount = {( amount: Double) -> Double in amount * 0.85 }
+print(applyDiscount(80.00))  // 68.00
+// 3
+var discountMessage = "15% off today"
+let printPromotion = {
+    print("Thai kitchen promotion: \(discountMessage)")
+}
+printPromotion()
+discountMessage = "happy hour - 20% off drinks"
+printPromotion()
 
-
-
+*/
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: "→ Pad Thai ←"
@@ -176,16 +209,31 @@ print(describePrice("Spring Rolls", 8.00)) // Spring Rolls (value) — $8.00
 //    Returns true if price is under $12.00
 //
 // 3. Use the full form closure inline in a filter call:
-//    Filter this array to only items with more than 5 characters:
 let staffNames = ["James", "Maria", "Carlos", "Aisha", "Tom", "Nina", "Derek"]
+//    Filter this array to only items with more than 5 characters:
 //    Store result in 'longNames' and print it
 //
+
+
 // 4. Use the full form closure inline in sorted:
 //    Sort staffNames by length (shortest first)
 //    Store in 'byLength' and print
 
 // YOUR CODE BELOW:
-
+// 1
+let formatCurrency: (Double) -> String = { (total: Double) -> String in "$\(String(format: "%.2f", total))"}
+let calculateLineTotal: (String, Int, Double) -> String = { (item: String, quantity: Int, unitPrice: Double) -> String in 
+    return "\(quantity)x \(item) - \(formatCurrency(unitPrice * Double(quantity)))"
+}
+print(calculateLineTotal("Pad Thai", 2, 14.99))
+// 2
+let isAffordable: (Double) -> Bool = { (price: Double) -> Bool in price < 12 }
+// 3
+let longNames = staffNames.filter({ (name: String) -> Bool in name.count > 5 })
+print(longNames) // ["Carlos"]
+// 4
+let byLength = staffNames.sorted(by: {(a: String, b: String) -> Bool in a.count < b.count})
+print(byLength)
 
 
 
@@ -251,20 +299,20 @@ for receipt in receipts {
 // multiple trailing closures (Swift 5.3+)
 // when a function has multiple closure params, only the last uses trailing syntax
 // all others must be inside parens
-func processOrder(
-    onSuccess: () -> Void,
-    onFailure: () -> Void
-) {
-    let succeeded = true
-    if succeeded { onSuccess() } else { onFailure() }
-}
+// func processOrder(
+//     onSuccess: () -> Void,
+//     onFailure: () -> Void
+// ) {
+//     let succeeded = true
+//     if succeeded { onSuccess() } else { onFailure() }
+// }
 
-// multiple trailing closure syntax
-processOrder {
-    print("Order placed successfully")
-} onFailure: {
-    print("Order failed")
-}
+// // multiple trailing closure syntax
+// processOrder {
+//     print("Order placed successfully")
+// } onFailure: {
+//     print("Order failed")
+// }
 
 // SwiftUI preview — this is exactly how Button works:
 // Button("Tap me") {
@@ -275,12 +323,16 @@ processOrder {
 // Rewrite each using trailing closure syntax
 // (no closure inside the parentheses)
 //
+
 // 1. Rewrite this using trailing closure:
 //    let filtered = menuPrices.filter({ price in price > 10 })
+
+// 1
+// let filtered = menuPrices.filter { $0 > 10 }
 //
 // 2. Rewrite this using trailing closure:
 //    let names = staffNames.map({ name in name.uppercased() })
-//
+
 // 3. Rewrite this using trailing closure (multi-line body):
 //    Create a sorted version of staffNames where names starting
 //    with a vowel come first, then alphabetical for the rest
@@ -298,12 +350,39 @@ processOrder {
 
 
 
+
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: [14.99, 12.50, 16.00]
 // Exercise 2: ["JAMES", "MARIA", "CARLOS", "AISHA", "TOM", "NINA", "DEREK"]
 // Exercise 3: vowel names first — Aisha first, then rest alphabetically
 // Exercise 4: happy hour prices, surcharge prices
 
+// 1
+let filtered = menuPrices.filter { $0 > 10 }
+// 2
+let names = staffNames.map { $0.uppercased()}
+// print(names)
+// 3
+let namesStartingWithVowels = staffNames.sorted { a, b in 
+    let aIsVowel = "AEIOUaeiou".contains(a.first ?? "x")
+    let bIsVowel = "AEIOUaeiou".contains(b.first ?? "x")
+    
+    if aIsVowel && !bIsVowel { return true }   // case 1
+    if !aIsVowel && bIsVowel { return false }   // case 2
+    return a < b                                 // cases 3 and 4
+}
+print(namesStartingWithVowels)
+// 4
+func applyToMenu(prices: [Double], transform: (Double) -> Double) -> [Double] {
+    return prices.map(transform)
+}
+
+let applyDiscount = {(price: Double) -> Double in price * 0.80} 
+let applySurchange = {(price: Double) -> Double in price * 1.10} 
+
+print(applyToMenu(prices: [10.00, 100.00], transform: applyDiscount))
+print(applyToMenu(prices: [10.00, 100.00], transform: applySurchange))
+//
 
 // ============================================================
 // TOPIC 4 — SHORTHAND ARGUMENT NAMES: $0, $1
@@ -402,6 +481,7 @@ print(clear)
 // Exercise 4: alphabetically sorted
 // Exercise 5: comments explaining why named params are clearer
 
+/********************* TOPIC LINE BREAK ************************************
 
 // ============================================================
 // TOPIC 5 — CAPTURING VALUES
@@ -699,6 +779,7 @@ let underBudget = itemPrices.filter(isTotalUnderBudget)
 // Exercise 3: either works — comment explains your reasoning
 // Exercise 4: function — complex enough to name
 
+********************* TOPIC LINE BREAK *************************************/
 
 // ============================================================
 //
