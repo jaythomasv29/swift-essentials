@@ -471,6 +471,16 @@ print(clear)
 
 // YOUR CODE BELOW:
 
+// 1
+let capitalized = staffNames.map { $0.capitalized }
+// 2
+let longStaff = staffNames.filter{ $0.count > 4 }
+// 3
+let totalPrices = dishPrices.reduce(0, +)
+// 4
+let sortedAlpha = staffNames.sorted { $0 < $1 }
+// 5
+    // mainly because you know what is going on. The values being compared is more readable and reads as plain english instead of symbols.
 
 
 
@@ -481,7 +491,7 @@ print(clear)
 // Exercise 4: alphabetically sorted
 // Exercise 5: comments explaining why named params are clearer
 
-/********************* TOPIC LINE BREAK ************************************
+
 
 // ============================================================
 // TOPIC 5 — CAPTURING VALUES
@@ -527,7 +537,7 @@ func makeOrderCounter() -> () -> Int {
     return increment
 }
 
-let tableOneOrders = makeOrderCounter()
+let tableOneOrders = makeOrderCounter() // so inside the closure scope we have count = 0, and the closure returns a function that increments when stored as a variable, and called
 let tableTwoOrders = makeOrderCounter()
 
 print(tableOneOrders())   // 1
@@ -541,8 +551,8 @@ print(tableTwoOrders())   // 2
 // (weak self covered in Chapter 15 — memory management)
 
 // capturing in sorted — captures nothing, uses only parameters
-let names = ["Carlos", "James", "Maria"]
-let sorted2 = names.sorted { $0 < $1 }   // no capture needed
+// let names = ["Carlos", "James", "Maria"]
+// let sorted2 = names.sorted { $0 < $1 }   // no capture needed
 
 // capturing a threshold from outer scope
 let priceThreshold = 12.00
@@ -556,7 +566,7 @@ print(premiumItems)
 //    and adds it to dailyRevenue
 //    Call it with 85.50, 120.00, 45.00
 //    Print dailyRevenue after all three calls — should be 250.50
-//
+
 // 2. Write a function 'makeTabTracker' that returns () -> Double
 //    Inside, create a var 'tabTotal' = 0.0
 //    The returned closure should accept no args,
@@ -576,8 +586,38 @@ print(premiumItems)
 
 // YOUR CODE BELOW:
 
-
-
+// 1
+var dailyRevenue = 0.0
+let recordSale = {(amount: Double) in
+    dailyRevenue += amount
+}
+ //or  let recordSale = { dailyRevenue += $0 }
+recordSale(85.50)
+recordSale(120.00)
+recordSale(45.00)
+print(formatCurrency(dailyRevenue))  // 250.5
+// 2
+func makeTabTracker() -> (Double) -> Double {
+    var tabTotal = 0.0
+    let add = { (amount: Double) in
+        tabTotal += amount
+        return tabTotal
+    }
+    return add
+}
+let barTabTable1 = makeTabTracker()
+print(formatCurrency(barTabTable1(20)))
+print(formatCurrency(barTabTable1(15)))
+print(formatCurrency(barTabTable1(5)))  // $40.00
+// 3
+var minimumOrder = 10.00
+let meetsMinimum = {(amount: Double) -> Bool in 
+    return amount >= minimumOrder
+}
+print(meetsMinimum(8.00))  // false - 8 < 10
+print(meetsMinimum(15.00)) // true - 15 > 10
+minimumOrder = 20 // min changed to higher val
+print(meetsMinimum(15.00)) // false - 15 > 20
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: dailyRevenue = 250.5 after three calls
@@ -644,9 +684,9 @@ func loadGuestList(completion: @escaping ([String]) -> Void) {
     completion(guests)   // calls the closure with the result
 }
 
-loadGuestList { guests in
-    print("Loaded \(guests.count) guests")
-    for guest in guests {
+loadGuestList { 
+    print("Loaded \($0.count) guests")
+    for guest in $0 {
         print("  - \(guest)")
     }
 }
@@ -680,9 +720,58 @@ loadGuestList { guests in
 //    Test both paths
 
 // YOUR CODE BELOW:
+// 1
+var pendingHandler: (() -> Void)?
+func scheduleMessage(_ message: String, handler: @escaping () -> Void) {
+    print("Message scheduled: \(message)")
+    pendingHandler = handler
+}
 
+scheduleMessage("Hello World") {
+    print("Message sent")
+}
 
+pendingHandler?()
+// 2
+func processOrder(items: [String], onComplete: @escaping ([String]) -> Void) {
+    let onlyThaiDishes = items.filter { $0 != "Burger" }
+    onComplete(onlyThaiDishes)
+}
 
+processOrder(items: ["Pad Thai", "Burger", "Tom Kha", "Pizza", "Spring Rolls"]) {
+    for dish in $0 { print(dish)}
+}
+// 3
+func validateAndSubmit(guestName: String?, onSuccess: @escaping (String) -> Void, onFailure: @escaping (String) -> Void) {
+    guard let name = guestName, !name.isEmpty else { 
+        onFailure("Invalid guest name") 
+        return
+    }
+    onSuccess("Reservation confirmed for \(name)")    
+}
+
+validateAndSubmit(guestName: "James") {
+    print($0)
+} onFailure: { print($0) }
+
+validateAndSubmit(guestName: "") {
+    print($0)
+} onFailure: { print($0) }
+/** Or other method below:
+validateAndSubmit(guestName: "James") { message in
+    print(message)
+} onFailure: { error in
+    print(error)
+}
+
+validateAndSubmit(guestName: "") { message in
+    print(message)
+} onFailure: { error in
+    print(error)
+}
+*/
+
+/********************* TOPIC LINE BREAK ************************************
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: "Message scheduled" then handler called after
