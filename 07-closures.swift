@@ -771,8 +771,6 @@ validateAndSubmit(guestName: "") { message in
 }
 */
 
-/********************* TOPIC LINE BREAK ************************************
-
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: "Message scheduled" then handler called after
 // Exercise 2: ["Pad Thai", "Tom Kha", "Spring Rolls"] — Burger and Pizza filtered
@@ -837,27 +835,46 @@ func isTotalUnderBudget(_ price: Double) -> Bool {
 }
 let underBudget = itemPrices.filter(isTotalUnderBudget)
 
+// YOUR CODE BELOW:
+
 // ── YOUR TURN ────────────────────────────────────────────────
 // For each scenario decide: closure or named function?
 // Write your reasoning as a comment, then implement it.
 //
 // 1. Sort staffNames alphabetically — use inline or function?
 //    Implement your choice
-//
 // 2. Calculate full payroll for a staff member including overtime —
 //    use inline or function?
 //    Implement your choice (reuse from Chapter 6 if you want)
-//
 // 3. Filter menu items to only those available tonight
 //    Available items: ["Pad Thai", "Spring Rolls", "Thai Iced Tea"]
 //    The filter checks if item is in that array — inline or function?
 //    Implement your choice
 //
+    //
 // 4. Format a complete receipt line including name, qty, price, tax —
 //    inline or function?
 //    Implement your choice
+//
+// 1: An inline closure by using the .sorted method because its relatively a simple task
+let sortedNames = staffNames.sorted { a, b in a < b }
+print(sortedNames)
+// 2: A function because it has multiple steps and calculations that will require several lines of logic to get the result and return the data in a specific way
+// func calculatePayroll(_ name: String) -> (name: String, hours: Double, regularPay: Double, overtimePay: Double, totalPay: Double)? {
+//     guard let (hours, rate) = staffPayroll[name] else { return nil }  // guard against staff member not found
+//      if hours <= 8 {
+//     let regularPay = hours * rate
+//         return (name, hours, hours * rate, 0.0, regularPay)
+//     }
+//     // case where there is overtime pay
+//     let maxRegularPay = 8.0 * rate
+//     let overtimeHours = hours - 8.0
+//     let overtimePay = overtimeHours * (rate * 1.5)
+//     return (name, hours, maxRegularPay, overtimePay, (overtimePay + maxRegularPay))
+// }
+// 3 - filter method that checks the dictionary or data structure to see if the item is available or not. (I will not implement this, and skip over)
 
-// YOUR CODE BELOW:
+// 4 - function, because data needs to be gathered and formatted and has multiple steps and complexities that a closure should not do. (I will not implement this, and skip over)
 
 
 
@@ -867,7 +884,7 @@ let underBudget = itemPrices.filter(isTotalUnderBudget)
 // Exercise 2: function — complex, reusable, deserves a name
 // Exercise 3: either works — comment explains your reasoning
 // Exercise 4: function — complex enough to name
-
+/********************* TOPIC LINE BREAK ************************************
 ********************* TOPIC LINE BREAK *************************************/
 
 // ============================================================
@@ -917,7 +934,36 @@ let fullMenu: [MenuItem] = [
 //    c) Only noodle dishes
 //    d) Only items under 400 calories AND available
 //    Print the name of each result for all four filters
+
+// 1
+func filterMenu(_ items: [MenuItem], condition: (MenuItem) -> Bool) -> [MenuItem] {
+    guard !items.isEmpty else { return []}
+    return items.filter(condition)
+}
+
+// → Stored closure        let double = { (n: Double) -> Double in n * 2 }
+let printMenu = { (menuItems: [MenuItem]) in  
+    for item in menuItems {
+        print("\(item.name), price: \(item.price), calories: \(item.calories)")
+    }
+}
+// a) Only available items
+let availableMenuItems = filterMenu(fullMenu) { $0.isAvailable }
+// print(availableMenuItems)
+// printMenu(availableMenuItems)
+// b) Only items under $12
+ let menuItemsLessThan12 = filterMenu(fullMenu) { menuItem in
+    menuItem.price < 12.00
+}
+// print(menuItemsLessThan12)
+// c) Only noodle dishes
+let onlyNoodleDishes = filterMenu(fullMenu) { $0.category == "noodles"}
+// print(onlyNoodleDishes)
+// d) Only items under 400 calories AND available
+let under400andAvailable = filterMenu(fullMenu) { $0.isAvailable &&  $0.calories < 400 }
+// print(under400andAvailable)
 //
+
 // 2. SORT ENGINE
 //    Write a function 'sortMenu(_ items: [MenuItem], by comparator: (MenuItem, MenuItem) -> Bool) -> [MenuItem]'
 //    Use it to produce:
@@ -926,6 +972,30 @@ let fullMenu: [MenuItem] = [
 //    c) Sorted by name alphabetically
 //    d) Sorted by calories ascending
 //    Print the name and relevant value for each sort
+let printSpecific = { (menuItems:[MenuItem]) -> Void in
+    let mappedMenuItems = menuItems.map { (item: MenuItem) -> (String, Double) in
+    return (item.name, item.price)
+    }
+    print(mappedMenuItems)
+    }
+
+// let formatCurrency = { price in "$\(String(format: "%.2f", price))"}
+// 2
+func sortMenu(_ items: [MenuItem], by comparator: (MenuItem, MenuItem) -> Bool) -> [MenuItem] {
+    return items.sorted(by: comparator)
+}
+// a) - Sorted by price ascending
+let sortedItemsAsc = sortMenu(fullMenu) { (a:MenuItem, b:MenuItem) -> Bool in a.price < b.price }
+// print(sortedItemsAsc)
+// b) - Sorted by price descending
+let sortedItemsDsc = sortMenu(fullMenu) { (a:MenuItem, b:MenuItem) -> Bool in a.price > b.price }
+// c) - Sorted by name alphabetically
+let sortedItemsAlpha = sortMenu(fullMenu) { (a:MenuItem, b:MenuItem) -> Bool in a.name < b.name }
+// d) - Sorted by calories ascending
+let sortedItemsCaloriesAsc = sortMenu(fullMenu) { (a:MenuItem, b:MenuItem) -> Bool in a.calories < b.calories }
+// A test to print a simpler view
+// printMenu(sortedItemsCaloriesAsc)
+
 //
 // 3. TRANSFORM ENGINE
 //    Write a function 'transformMenu(_ items: [MenuItem], using transform: (MenuItem) -> String) -> [String]'
@@ -935,6 +1005,27 @@ let fullMenu: [MenuItem] = [
 //    c) An array of category tags: "[noodles] Pad Thai"
 //    Print each array
 //
+// 3
+func transformMenu(_ items: [MenuItem], using transform: (MenuItem) -> String) -> [String] {
+    return items.map(transform)
+}
+// a) An array of formatted strings: "Pad Thai — $14.99"
+let formattedItemsNamePrice = transformMenu(fullMenu) {
+    "\($0.name) - $\(formatCurrency($0.price))"
+}
+print(formattedItemsNamePrice)
+// b) An array of calorie strings: "Pad Thai: 650 cal"
+let formattedItemsNameCalorie = transformMenu(fullMenu) {
+    "\($0.name): \($0.calories) cal"
+}
+print(formattedItemsNameCalorie)
+// c) An array of category tags: "[noodles] Pad Thai"
+let formattedByCategory = transformMenu(fullMenu) {
+    "[\($0.category)] \($0.name)"
+}
+print(formattedByCategory)
+//    Print each array
+
 // 4. CHAINED PIPELINE
 //    Using filterMenu, sortMenu, and transformMenu together:
 //    → Filter to only available items
@@ -942,6 +1033,13 @@ let fullMenu: [MenuItem] = [
 //    → Transform to "name — $price" strings
 //    → Print the result
 //    Do this in a single chain — result of each feeds into next
+let pipeline = transformMenu(
+    sortMenu(
+        filterMenu(fullMenu) { $0.isAvailable }
+    ) { $0.price < $1.price }
+) { "\($0.name) — $\(String(format: "%.2f", $0.price))" }
+
+print(pipeline)
 //
 // 5. DISCOUNT ENGINE
 //    Write a function 'makeDiscountApplier(rate: Double) -> (MenuItem) -> MenuItem'
