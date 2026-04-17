@@ -309,7 +309,7 @@ struct FoulTracker {
                 fouls = 6   // foul out — clamp to max
                 print("\(name) has fouled out")
             } else {
-                print("\(name) now has \(fouls) fouls")
+                print("\(name) now has \(fouls) fouls \(oldValue) -> \(fouls)")
             }
         }
     }
@@ -346,10 +346,59 @@ print(player.fouls) // 6
 //    Test by assigning pickNumber = 0, pickNumber = 45, pickNumber = 99
 
 // YOUR CODE BELOW:
+// 1
+struct Scoreboard {
+    var homeTeam: String
+    var awayTeam: String
+    var homeScore: Int {
+        didSet {
+        print("\(homeTeam) scores! \(homeScore > awayScore ? "Now leading" : "Trailing") \(homeTeam) \(homeScore)-\(awayScore) \(awayTeam)")
+        }
+    }   
+    var awayScore: Int {
+        didSet {
+        print("\(awayScore) scores! \(awayScore > homeScore ? "Now leading" : "Trailing") \(awayScore) \(awayTeam)-\(homeScore) \(homeTeam)")
+        }
+    }
+}
+var scoreboard1 = Scoreboard(homeTeam: "Warriors", awayTeam: "Kings", homeScore: 50, awayScore: 50)
+scoreboard1.awayScore = 54
+scoreboard1.homeScore = 55
+// 2
+struct PlayerStamina {
+    let name: String
+    var minutesPlayed: Double {
+        willSet {
+            print("Subbing \(name) in for minute \(newValue)")
+        }
+        didSet {
+            if minutesPlayed > 38.0 {
+                print("⚠️  \(name) is over 38 minutes — fatigue risk")
+            }
+        }
+    }
+}
+
+let playerStamina = PlayerStamina(name: "Curry", minutesPlayed: 30)
+// 3
+struct DraftBoard {
+    var pickNumber: Int {
+        didSet {
+            if pickNumber > 60 {
+                pickNumber = 60
+                print("Invalid pick number - clamped to \(pickNumber)")
+            } else if pickNumber < 1 {
+                pickNumber = 1
+                print("Invalid pick number - clamped to \(pickNumber)")
+            }
+        }
+    }
+}
+
+var draftBoard = DraftBoard(pickNumber: 60)
+draftBoard.pickNumber = 62
 
 
-
-/**
 // ── CHECK YOURSELF ───────────────────────────────────────────
 // Exercise 1: score updates trigger correct home/away messages
 // Exercise 2: warning fires only when > 38 minutes
@@ -419,8 +468,35 @@ print(report.reportHeader)   // returns cached value — not recomputed
 //    Add a comment explaining what you observed.
 
 // YOUR CODE BELOW:
+// 1
+struct PlayerProfile {
+    var name: String
+    var pointsPerGame: Double
+    var assistsPerGame: Double
+    var reboundsPerGame: Double
+    var gamesPlayed: Int
+    lazy var seasonTotals: String = {
+        return "\(name) - \(pointsPerGame * Double(gamesPlayed)) pts, \(assistsPerGame * Double(gamesPlayed)) ast, \(reboundsPerGame * Double(gamesPlayed)) reb over \(gamesPlayed) games"
+    }()
+    
+}
 
+var playerprofile1 = PlayerProfile(name: "Stephen Curry", pointsPerGame: 23.5, assistsPerGame: 8.3, reboundsPerGame: 5.2, gamesPlayed: 74) 
+print(playerprofile1.seasonTotals)
 
+// 2
+struct PlayoffBracket {
+    var seed: Int
+    var teamName: String
+    var wins: Int
+    var losses: Int
+    lazy var bracketLabel: String = {
+        return "(\(seed)) \(teamName) - \(wins)-\(losses)"
+    }()
+    
+}
+var playoffBracket1 = PlayoffBracket(seed: 3, teamName: "Warriors", wins: 2, losses: 1)
+print(playoffBracket1.bracketLabel)
 
 
 // ── CHECK YOURSELF ───────────────────────────────────────────
